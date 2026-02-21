@@ -404,19 +404,19 @@
         "id": "list-content-checks-usecase",
         "description": "src/backend/contexts/content-check/application/usecases/list-content-checks.usecase.ts を新規作成: ListContentChecksUseCase クラス（コンストラクタ DI: ContentCheckRepository, ContentSegmentRepository, CheckResultRepository）。execute(filter?: ContentCheckFilter): Promise<ContentCheckListDto> で (1) contentCheckRepository.findAll(filter) で一覧取得、(2) 各 ContentCheck の contentCheckId で segmentRepository.findByContentCheckId と checkResultRepository.findByContentCheckId を並列取得（Promise.all）、(3) 各チェックの segmentCount と summary（error/warning/info カウント）を集計して ContentCheckListItemDto を組み立て返却。src/backend/contexts/content-check/application/usecases/__tests__/list-content-checks.usecase.test.ts にユニットテストを追加（全 Repository をモック、正常系: フィルタなし一覧・source フィルタ・status フィルタの各ケースで DTO が正しく組み立てられることを検証）",
         "wave": 5,
-        "done": false
+        "done": true
       },
       {
         "id": "check-history-table-component",
         "description": "src/components/dashboard/check-history-table.tsx を新規作成（Server Component）: ContentCheckListItemDto[] を props で受け取り、shadcn/ui Table を使って一覧表示。カラム構成: ソース種別（Web/Slack バッジ）・ステータス（pending/processing/completed/failed をカラーバッジ）・サマリー（error/warning/info 件数）・実行日時（日本語フォーマット）・操作（詳細へリンク）。各行全体が /checks/[id] へのリンク（Next.js Link）になっていること。データが0件の場合は「チェック履歴がありません」を表示",
         "wave": 5,
-        "done": false
+        "done": true
       },
       {
         "id": "check-history-filter-component",
         "description": "src/components/dashboard/check-history-filter.tsx を新規作成（'use client'）: ソース種別（全て/Web/Slack）・ステータス（全て/pending/processing/completed/failed）・実行日時範囲（開始日・終了日）のフィルタ UI。shadcn/ui の Select と Input（type=date）を使用。フィルタ変更時は useRouter + router.push で ?source=web&status=completed&from=2024-01-01&to=2024-01-31 形式の searchParams を URL に反映する（Client Component による URL クエリパラメータ操作）",
         "wave": 5,
-        "done": false
+        "done": true
       },
       {
         "id": "dashboard-composition-and-loader",
