@@ -398,7 +398,7 @@
         "id": "content-check-filter-repository",
         "description": "src/backend/contexts/content-check/infrastructure/repositories/prisma-content-check.repository.ts を更新: findAll(filter?) の where 条件に source フィルタ（filter.source があれば { source: filter.source as Source } を追加）と createdAt 範囲フィルタ（createdAfter/createdBefore があれば { createdAt: { gte: filter.createdAfter, lte: filter.createdBefore } } を追加）を対応させる。また toDomain() で ContentCheck に source フィールドを含めるよう ContentCheckProps と ContentCheck モデルも更新し、DB の source カラムを domain モデルに反映する",
         "wave": 6,
-        "done": false
+        "done": true
       },
       {
         "id": "list-content-checks-usecase",
@@ -422,11 +422,17 @@
         "id": "dashboard-composition-and-loader",
         "description": "content-check.composition.ts を更新して createListContentChecksUseCase()（PrismaContentCheckRepository + PrismaContentSegmentRepository + PrismaCheckResultRepository を注入）ファクトリ関数を追加。src/backend/contexts/content-check/presentation/loaders/list-content-checks.loader.ts を新規作成: loadContentCheckList(filter?: { source?: string; status?: string; from?: string; to?: string }): Promise<ContentCheckListDto>。searchParams の文字列を ContentCheckFilter 型に変換（source/status の型キャスト、from/to を Date に変換）して createListContentChecksUseCase().execute() を呼び出す",
         "wave": 6,
-        "done": false
+        "done": true
       },
       {
         "id": "dashboard-page",
         "description": "src/app/(app)/page.tsx を更新（Server Component）: searchParams から source/status/from/to を受け取り loadContentCheckList(filter) を呼び出して ContentCheckListDto を取得。CheckHistoryFilter コンポーネント（フィルタ UI）と CheckHistoryTable コンポーネント（一覧テーブル）を配置。ページタイトル「チェック履歴」と「新規チェック」ボタン（/checks/new へのリンク）を上部に表示。e2e/dashboard.spec.ts を新規作成: / にアクセスしてチェック履歴テーブルが表示されることを確認・フィルタ（ソース種別 Select）を変更すると URL が更新されテーブル内容が変わること・各行クリックで /checks/[id] に遷移すること・完全な E2E シナリオ（/checks/new でチェック実行 → 完了 → / に戻って履歴に表示されていること）を確認する基本シナリオを追加",
+        "wave": 6,
+        "done": true
+      },
+      {
+        "id": "fix-dashboard-e2e-selectors",
+        "description": "e2e/dashboard.spec.ts で4件のテストが失敗する。根本原因: (1)「新規チェック」ボタンテスト: サイドバーのナビゲーションにも「新規チェック」リンクが存在するため getByRole('link', { name: '新規チェック' }) が2要素にマッチし strict mode violation が発生する。修正方針: page.getByRole('main').getByRole('link', { name: '新規チェック' }) のように main 領域に絞り込む。(2) フィルタUIクリックテスト: page.getByLabel('ソース種別') で取得したセレクトボタンをクリックしようとするが、サイドバーの div[data-sidebar='content'] 要素がポインタイベントをインターセプトしている。修正方針: page.getByRole('main') 内のフィルタ要素に絞り込む（例: page.getByRole('main').getByLabel('ソース種別')）か、セレクトに id='filter-source' が付与されているため page.locator('#filter-source') を使用する。",
         "wave": 6,
         "done": false
       }
