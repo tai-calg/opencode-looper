@@ -22,11 +22,11 @@ test.describe('/ ダッシュボードページ', () => {
 	});
 
 	test('「新規チェック」ボタンが表示される', async ({ page }) => {
-		await expect(page.getByRole('link', { name: '新規チェック' })).toBeVisible();
+		await expect(page.getByRole('main').getByRole('link', { name: '新規チェック' })).toBeVisible();
 	});
 
 	test('「新規チェック」ボタンが /checks/new へのリンクになっている', async ({ page }) => {
-		const link = page.getByRole('link', { name: '新規チェック' });
+		const link = page.getByRole('main').getByRole('link', { name: '新規チェック' });
 		await expect(link).toHaveAttribute('href', '/checks/new');
 	});
 
@@ -45,16 +45,16 @@ test.describe('/ フィルタ UI', () => {
 	});
 
 	test('ソース種別フィルタが表示される', async ({ page }) => {
-		await expect(page.getByLabel('ソース種別')).toBeVisible();
+		await expect(page.getByRole('main').getByLabel('ソース種別')).toBeVisible();
 	});
 
 	test('ステータスフィルタが表示される', async ({ page }) => {
-		await expect(page.getByLabel('ステータス')).toBeVisible();
+		await expect(page.getByRole('main').getByLabel('ステータス')).toBeVisible();
 	});
 
 	test('ソース種別フィルタを変更すると URL に source パラメータが追加される', async ({ page }) => {
 		// ソース種別セレクトを操作
-		const sourceTrigger = page.getByLabel('ソース種別');
+		const sourceTrigger = page.getByRole('main').getByLabel('ソース種別');
 		await sourceTrigger.click();
 
 		// Web オプションを選択
@@ -66,7 +66,7 @@ test.describe('/ フィルタ UI', () => {
 	});
 
 	test('ステータスフィルタを変更すると URL に status パラメータが追加される', async ({ page }) => {
-		const statusTrigger = page.getByLabel('ステータス');
+		const statusTrigger = page.getByRole('main').getByLabel('ステータス');
 		await statusTrigger.click();
 
 		const completedOption = page.getByRole('option', { name: 'completed' });
@@ -81,7 +81,7 @@ test.describe('/ フィルタ UI', () => {
 		await expect(page).toHaveURL(/source=web/);
 
 		// ソース種別を「全て」に戻す
-		const sourceTrigger = page.getByLabel('ソース種別');
+		const sourceTrigger = page.getByRole('main').getByLabel('ソース種別');
 		await sourceTrigger.click();
 		const allOption = page.getByRole('option', { name: '全て' }).first();
 		await allOption.click();
