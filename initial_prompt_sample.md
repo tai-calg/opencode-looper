@@ -39,7 +39,9 @@ F. ナレッジの手動登録・編集
 G. 記事コンテンツの自動取込（noteについて、アカウントを指定して記事URL一覧を読み込み、ボタンを推すとDB保存できる）
 
 使うLLM:
-Claude
+Claude (vercel ai agent経由)
+embedding: openAI
+.env に下記のキーがあるので利用すること
 
 実行環境:
 Next + vercel + supabase
