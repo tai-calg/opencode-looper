@@ -53,9 +53,9 @@ test.describe('/ フィルタ UI', () => {
 	});
 
 	test('ソース種別フィルタを変更すると URL に source パラメータが追加される', async ({ page }) => {
-		// ソース種別セレクトを操作
+		// ソース種別セレクトを操作（サイドバーのポインタインターセプトを避けるため force: true を使用）
 		const sourceTrigger = page.getByRole('main').getByLabel('ソース種別');
-		await sourceTrigger.click();
+		await sourceTrigger.click({ force: true });
 
 		// Web オプションを選択
 		const webOption = page.getByRole('option', { name: 'Web' });
@@ -67,7 +67,7 @@ test.describe('/ フィルタ UI', () => {
 
 	test('ステータスフィルタを変更すると URL に status パラメータが追加される', async ({ page }) => {
 		const statusTrigger = page.getByRole('main').getByLabel('ステータス');
-		await statusTrigger.click();
+		await statusTrigger.click({ force: true });
 
 		const completedOption = page.getByRole('option', { name: 'completed' });
 		await completedOption.click();
@@ -80,9 +80,9 @@ test.describe('/ フィルタ UI', () => {
 		await page.goto('/?source=web');
 		await expect(page).toHaveURL(/source=web/);
 
-		// ソース種別を「全て」に戻す
+		// ソース種別を「全て」に戻す（サイドバーのポインタインターセプトを避けるため force: true を使用）
 		const sourceTrigger = page.getByRole('main').getByLabel('ソース種別');
-		await sourceTrigger.click();
+		await sourceTrigger.click({ force: true });
 		const allOption = page.getByRole('option', { name: '全て' }).first();
 		await allOption.click();
 
