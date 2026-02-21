@@ -1,19 +1,25 @@
+import type { ProgressEvent } from '@/backend/contexts/content-check/application/usecases/execute-content-check.usecase';
 import { createExecuteContentCheckUseCase } from '@/backend/contexts/content-check/presentation/composition/content-check.composition';
 import { createUserId } from '@/backend/contexts/shared/domain/models/user-id.model';
 import { createSupabaseServerClient } from '@/backend/contexts/shared/infrastructure/db/supabase-server-client';
-import type { NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 const DUMMY_USER_ID = '00000000-0000-0000-0000-000000000000';
 
 export async function POST(request: NextRequest): Promise<Response> {
 	const body = (await request.json()) as { originalText?: unknown; source?: unknown };
-	const { originalText, source } = body;
+	const originalText = typeof body.originalText === 'string' ? body.originalText : '';
+	const source = typeof body.source === 'string' ? body.source : 'web';
 
-	if (typeof originalText !== 'string' || typeof source !== 'string') {
-		return new Response(JSON.stringify({ error: 'originalText and source are required' }), {
-			status: 400,
-			headers: { 'Content-Type': 'application/json' },
-		});
+	if (!originalText || originalText.trim().length === 0) {
+		return NextResponse.json({ error: 'originalText is required' }, { status: 400 });
+	}
+
+	if (originalText.length > 30000) {
+		return NextResponse.json(
+			{ error: 'originalText must be 30000 characters or less' },
+			{ status: 400 },
+		);
 	}
 
 	let userId = createUserId(DUMMY_USER_ID);
@@ -24,10 +30,7 @@ export async function POST(request: NextRequest): Promise<Response> {
 			data: { session },
 		} = await supabase.auth.getSession();
 		if (!session?.user?.id) {
-			return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-				status: 401,
-				headers: { 'Content-Type': 'application/json' },
-			});
+			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 		}
 		userId = createUserId(session.user.id);
 	}
@@ -38,23 +41,23 @@ export async function POST(request: NextRequest): Promise<Response> {
 		async start(controller) {
 			const encoder = new TextEncoder();
 
-			const sendEvent = (event: unknown): void => {
+			const sendEvent = (event: ProgressEvent) => {
 				const data = `data: ${JSON.stringify(event)}\n\n`;
 				controller.enqueue(encoder.encode(data));
 			};
 
 			try {
 				await useCase.execute({
-					originalText,
 					source,
+					originalText,
 					userId,
-					onProgress: (event) => {
-						sendEvent(event);
-					},
+					onProgress: sendEvent,
 				});
 			} catch (err) {
 				const reason = err instanceof Error ? err.message : String(err);
-				sendEvent({ type: 'error', data: { reason } });
+				const errorEvent: ProgressEvent = { type: 'error', data: { reason } };
+				const data = `data: ${JSON.stringify(errorEvent)}\n\n`;
+				controller.enqueue(encoder.encode(data));
 			} finally {
 				controller.close();
 			}
