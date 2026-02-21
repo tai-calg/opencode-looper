@@ -183,7 +183,7 @@
     "milestone": 4,
     "goal": "/knowledge ページでナレッジ記事の一覧表示・手動登録・編集ができ、保存時に OpenAI Embeddings API で Embedding が自動生成されて pgvector に格納され、KnowledgeArticle / KnowledgeEmbedding ドメインモデル → Repository → UseCase → UI が動作する",
     "verification": "pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm exec playwright test",
-    "done": false,
+    "done": true,
     "tasks": [
       {
         "id": "knowledge-contracts",
@@ -249,13 +249,13 @@
         "id": "verify-milestone4",
         "description": "pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm exec playwright test を実行し全て成功することを確認。Biome lint エラー・TypeScript 型エラー・ビルドエラー・テスト失敗・E2E テスト失敗があれば全て修正する",
         "wave": 6,
-        "done": false
+        "done": true
       },
       {
         "id": "fix-e2e-next-build-conflict",
         "description": "E2E テストが Runtime Error で失敗する問題を修正する。原因: pnpm build（本番ビルド）実行後に pnpm e2e を実行すると playwright.config.ts の webServer.command である pnpm dev が .next/ ディレクトリの不完全な状態で起動し、'ENOENT: no such file or directory, open .../.next/server/pages/_document.js' エラーが発生してページが表示されない。修正方針: playwright.config.ts の webServer.command を 'pnpm dev' から '.next/ を削除してから pnpm dev を起動するコマンド' に変更するか、または pnpm verify の e2e 実行前に .next/ をクリアするステップを追加する（例: 'rm -rf .next && pnpm dev'）。あるいは webServer を 'next build && next start' に変更して本番ビルドのサーバーで E2E を実行することも検討する",
         "wave": 7,
-        "done": false
+        "done": true
       },
       {
         "id": "fix-knowledge-embedding-repository-test-dimensions",
@@ -267,7 +267,7 @@
         "id": "fix-e2e-database-url-missing",
         "description": "E2E テストが DATABASE_URL 未設定環境でクラッシュする問題を修正する。原因: pnpm e2e 実行時に playwright.config.ts の webServer.command である pnpm dev が起動し、/rules・/knowledge ページアクセス時に PrismaClientInitializationError（DATABASE_URL not found）が発生してページが表示されない。修正方針: docs/infrastructure.md の「ローカル開発環境」セクションに従い、Supabase CLI でローカル DB を立てて DATABASE_URL を設定する。手順: (1) supabase start でローカル Supabase を起動、(2) supabase status で DB URL を取得、(3) apps/content-reviewer/.env.local に DATABASE_URL を設定、(4) prisma db push でスキーマを反映、(5) pnpm verify を再実行して E2E が通ることを確認する。ANTHROPIC_API_KEY と OPENAI_API_KEY はローカルの .env に既存。",
         "wave": 9,
-        "done": false
+        "done": true
       }
     ]
   },

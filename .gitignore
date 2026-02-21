@@ -13,6 +13,7 @@ coverage/
 playwright-report/
 test-results/
 looper/output/
+.playwright-mcp/
 
 # Supabase local
 supabase/.temp/
