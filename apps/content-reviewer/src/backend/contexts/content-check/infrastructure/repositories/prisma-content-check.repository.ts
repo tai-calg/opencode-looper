@@ -49,6 +49,15 @@ export class PrismaContentCheckRepository implements ContentCheckRepository {
 		const where = {
 			...(filter?.userId ? { userId: filter.userId as string } : {}),
 			...(filter?.status ? { status: filter.status as Status } : {}),
+			...(filter?.source ? { source: filter.source as Source } : {}),
+			...(filter?.createdAfter || filter?.createdBefore
+				? {
+						createdAt: {
+							...(filter.createdAfter ? { gte: filter.createdAfter } : {}),
+							...(filter.createdBefore ? { lte: filter.createdBefore } : {}),
+						},
+					}
+				: {}),
 		};
 
 		const records = await this.prisma.contentCheck.findMany({

@@ -211,6 +211,87 @@ describe('PrismaContentCheckRepository', () => {
 			});
 		});
 
+		it('should apply source filter', async () => {
+			const prisma = createMockPrisma();
+			const repo = new PrismaContentCheckRepository(prisma);
+
+			await repo.findAll({ source: 'web' });
+
+			expect(prisma.contentCheck.findMany).toHaveBeenCalledWith({
+				where: { source: 'web' },
+				orderBy: { createdAt: 'desc' },
+			});
+		});
+
+		it('should apply slack source filter', async () => {
+			const prisma = createMockPrisma();
+			const repo = new PrismaContentCheckRepository(prisma);
+
+			await repo.findAll({ source: 'slack' });
+
+			expect(prisma.contentCheck.findMany).toHaveBeenCalledWith({
+				where: { source: 'slack' },
+				orderBy: { createdAt: 'desc' },
+			});
+		});
+
+		it('should apply createdAfter filter', async () => {
+			const prisma = createMockPrisma();
+			const repo = new PrismaContentCheckRepository(prisma);
+			const createdAfter = new Date('2024-01-01T00:00:00.000Z');
+
+			await repo.findAll({ createdAfter });
+
+			expect(prisma.contentCheck.findMany).toHaveBeenCalledWith({
+				where: { createdAt: { gte: createdAfter } },
+				orderBy: { createdAt: 'desc' },
+			});
+		});
+
+		it('should apply createdBefore filter', async () => {
+			const prisma = createMockPrisma();
+			const repo = new PrismaContentCheckRepository(prisma);
+			const createdBefore = new Date('2024-12-31T23:59:59.999Z');
+
+			await repo.findAll({ createdBefore });
+
+			expect(prisma.contentCheck.findMany).toHaveBeenCalledWith({
+				where: { createdAt: { lte: createdBefore } },
+				orderBy: { createdAt: 'desc' },
+			});
+		});
+
+		it('should apply both createdAfter and createdBefore filters', async () => {
+			const prisma = createMockPrisma();
+			const repo = new PrismaContentCheckRepository(prisma);
+			const createdAfter = new Date('2024-01-01T00:00:00.000Z');
+			const createdBefore = new Date('2024-12-31T23:59:59.999Z');
+
+			await repo.findAll({ createdAfter, createdBefore });
+
+			expect(prisma.contentCheck.findMany).toHaveBeenCalledWith({
+				where: { createdAt: { gte: createdAfter, lte: createdBefore } },
+				orderBy: { createdAt: 'desc' },
+			});
+		});
+
+		it('should apply source and createdAt range filters together', async () => {
+			const prisma = createMockPrisma();
+			const repo = new PrismaContentCheckRepository(prisma);
+			const createdAfter = new Date('2024-01-01T00:00:00.000Z');
+			const createdBefore = new Date('2024-12-31T23:59:59.999Z');
+
+			await repo.findAll({ source: 'slack', createdAfter, createdBefore });
+
+			expect(prisma.contentCheck.findMany).toHaveBeenCalledWith({
+				where: {
+					source: 'slack',
+					createdAt: { gte: createdAfter, lte: createdBefore },
+				},
+				orderBy: { createdAt: 'desc' },
+			});
+		});
+
 		it('should map records to domain models', async () => {
 			const record = makePrismaRecord();
 			const mockContentCheck = makeDomainContentCheck();
