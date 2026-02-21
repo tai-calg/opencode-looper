@@ -377,19 +377,19 @@
       {
         "id": "verify-milestone6",
         "description": "pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm exec playwright test を実行し全て成功することを確認。Biome lint エラー・TypeScript 型エラー・ビルドエラー・テスト失敗・E2E テスト失敗があれば全て修正する",
-        "wave": 6,
+        "wave": 7,
         "done": false
       },
       {
         "id": "fix-knowledge-import-error-handling",
         "description": "E2E テスト knowledge-import.spec.ts が失敗する。根本原因: apps/content-reviewer/src/app/(app)/knowledge/import/page.tsx が loadNoteArticles() を呼び出す際にエラーハンドリングがなく、NoteScraperHttpGateway.fetchArticleList() が HTTP 404 を返すと未処理エラーになりページクラッシュする。修正方針: page.tsx の loadNoteArticles() 呼び出しを try-catch で囲み、エラー時は articles=[] または errorMessage を state にセットして「記事が見つかりませんでした。」または「取得に失敗しました。」を表示する。またはローダー側でエラーをキャッチして空配列を返す。E2E テストが期待している getByRole('table').or(getByText('記事が見つかりませんでした。')) が visible になれば pass する",
-        "wave": 7,
+        "wave": 6,
         "done": false
       },
       {
         "id": "fix-content-check-dummy-user-fk-violation",
         "description": "E2E テスト checks.spec.ts のフローテストが失敗する。根本原因: apps/content-reviewer/src/app/api/checks/execute/route.ts が NODE_ENV=development 時にダミーユーザー ID (00000000-0000-0000-0000-000000000000) を ContentCheck に設定して save しようとするが、users テーブルにそのユーザーが存在しないため prisma.contentCheck.upsert() が外部キー制約違反 (content_checks_user_id_fkey) で失敗する。修正方針: ContentCheck.userId は nullable (userId?: UserId) であるため、NODE_ENV=development 時は userId を undefined のまま execute() に渡し、DB に null で保存されるようにする。route.ts から createUserId(DUMMY_USER_ID) の呼び出しを開発環境では行わず、userId を undefined にする。",
-        "wave": 8,
+        "wave": 6,
         "done": false
       }
     ]

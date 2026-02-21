@@ -140,7 +140,9 @@ for milestone in $(jq -r '.[]|select(.done==false)|.milestone' "$PLAN"); do
 				log "Builder: $id はコミットなし（スキップ）"
 			fi
 		done
-		[ ${#verified_branches[@]} -eq 0 ] && { log "Verifier: マージ対象なし（スキップ）"; continue; }
+		if [ ${#verified_branches[@]} -eq 0 ]; then
+			log "Verifier: マージ対象なし（検証のみ実行）"
+		fi
 		branch_list=$(printf "worktree/%s " "${verified_branches[@]}")
 		verifier_prompt=$(<"$SCRIPT_DIR/prompts/verifier.md")
 		verifier_prompt="${verifier_prompt//__BRANCHES__/$branch_list}"
