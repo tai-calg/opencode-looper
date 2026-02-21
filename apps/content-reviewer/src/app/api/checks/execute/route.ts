@@ -4,8 +4,6 @@ import { createUserId } from '@/backend/contexts/shared/domain/models/user-id.mo
 import { createSupabaseServerClient } from '@/backend/contexts/shared/infrastructure/db/supabase-server-client';
 import { type NextRequest, NextResponse } from 'next/server';
 
-const DUMMY_USER_ID = '00000000-0000-0000-0000-000000000000';
-
 export async function POST(request: NextRequest): Promise<Response> {
 	const body = (await request.json()) as { originalText?: unknown; source?: unknown };
 	const originalText = typeof body.originalText === 'string' ? body.originalText : '';
@@ -22,7 +20,7 @@ export async function POST(request: NextRequest): Promise<Response> {
 		);
 	}
 
-	let userId = createUserId(DUMMY_USER_ID);
+	let userId: ReturnType<typeof createUserId> | undefined = undefined;
 
 	if (process.env.NODE_ENV !== 'development') {
 		const supabase = await createSupabaseServerClient();
