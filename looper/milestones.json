@@ -392,7 +392,7 @@
         "id": "fix-openai-embedding-gateway-stub-mode",
         "description": "E2E テスト checks.spec.ts の '/checks/new → /checks/[id] フロー' が '401 Incorrect API key provided: dummy' で失敗する。根本原因: AnthropicAIGateway には ANTHROPIC_API_KEY 未設定時のスタブモードが実装済みだが、OpenAIEmbeddingGateway（openai-embedding.gateway.ts）には同等のスタブモードがない。OPENAI_API_KEY=dummy の環境で generateEmbedding() が実際の OpenAI API を呼び出し 401 エラーが発生し、ナレッジ整合性チェックが失敗してチェックフロー全体がエラー状態になる。修正方針: apps/content-reviewer/src/backend/contexts/shared/infrastructure/ai/openai-embedding.gateway.ts を修正し、OPENAI_API_KEY が未設定・'dummy'・'test' の場合は generateEmbedding() が固定のダミー配列（Array(1536).fill(0) 等の 1536 次元ゼロベクトル）を返すスタブ動作にする。AnthropicAIGateway の isStubMode() 実装を参考にすること。最終的に checks.spec.ts のフローテストが pass すること。",
         "wave": 1,
-        "done": false
+        "done": true
       },
       {
         "id": "content-check-filter-repository",
