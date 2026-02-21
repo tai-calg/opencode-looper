@@ -455,6 +455,55 @@
     "goal": "/api/slack/events で Slack Events API の Webhook を受信し、Slack 署名検証・url_verification 対応の上、@sns-checker メンション時に waitUntil でバックグラウンドチェックを実行し、完了後にスレッドへ結果サマリーと /checks/[id] のパーマリンクを返信できる",
     "verification": "pnpm lint && pnpm typecheck && pnpm build && pnpm test",
     "done": false,
-    "tasks": []
+    "tasks": [
+      {
+        "id": "slack-contracts",
+        "description": "Slack 連携に必要な契約定義。(1) src/backend/contexts/content-check/domain/gateways/slack.gateway.ts を新規作成: SlackGateway interface（postMessage(channelId: string, threadTs: string, text: string): Promise<void>）を定義。(2) src/backend/contexts/content-check/domain/models/content-check.model.ts の ContentCheckProps に slackChannelId: string | null と slackThreadTs: string | null を追加し、ContentCheck.create() の props にも slack フィールドを追加（既存コードとの後方互換を保つため省略可能にする）。W2 以降の全タスクがこれらの型定義を参照する",
+        "wave": 1,
+        "done": false
+      },
+      {
+        "id": "slack-web-api-gateway",
+        "description": "Slack Web API を使ったメッセージ投稿の Gateway 実装。apps/content-reviewer/package.json に @slack/web-api を追加し pnpm install を実行。src/backend/contexts/content-check/infrastructure/slack-web-api.gateway.ts に SlackWebApiGateway implements SlackGateway を新規作成: コンストラクタで WebClient（@slack/web-api）を初期化（SLACK_BOT_TOKEN を利用）。postMessage(channelId, threadTs, text) で client.chat.postMessage({ channel: channelId, thread_ts: threadTs, text }) を呼び出す。SLACK_BOT_TOKEN が未設定・'dummy'・'test' の場合はスタブモードとしてログ出力のみ行い実際のAPI呼び出しをスキップする",
+        "wave": 2,
+        "done": false
+      },
+      {
+        "id": "slack-signature-verification",
+        "description": "Slack リクエスト署名検証ユーティリティの実装。src/lib/slack-signature.ts を新規作成: verifySlackSignature(signingSecret: string, signature: string, timestamp: string, rawBody: string): boolean を実装（node:crypto の createHmac('sha256', signingSecret) で v0:{timestamp}:{rawBody} を署名し x-slack-signature ヘッダーの値と timingSafeEqual で比較。タイムスタンプが5分以上古い場合は false を返す）。src/lib/env.ts を更新して getSlackSigningSecret(): string（SLACK_SIGNING_SECRET）と getSlackBotToken(): string（SLACK_BOT_TOKEN）を追加する",
+        "wave": 2,
+        "done": false
+      },
+      {
+        "id": "content-check-slack-fields-repository",
+        "description": "ContentCheck ドメインモデルと Repository への Slack フィールド反映。(1) src/backend/contexts/content-check/domain/models/content-check.model.ts を更新: W1 で追加した slackChannelId / slackThreadTs フィールドをコンストラクタ・create()・reconstruct()・startProcessing()・complete()・fail() の各メソッドで正しく受け渡す実装を追加する。(2) src/backend/contexts/content-check/infrastructure/repositories/prisma-content-check.repository.ts を更新: toDomain() で record.slackChannelId / record.slackThreadTs をドメインモデルにマッピング。toPrisma() で contentCheck.slackChannelId / contentCheck.slackThreadTs を Prisma データにマッピングする。(3) save() の upsert update 句に slackChannelId と slackThreadTs を含める",
+        "wave": 2,
+        "done": false
+      },
+      {
+        "id": "notify-slack-usecase",
+        "description": "Slack スレッドへの結果通知ユースケース。src/backend/contexts/content-check/application/usecases/notify-slack-result.usecase.ts を新規作成: NotifySlackResultUseCase クラス（コンストラクタ DI: ContentCheckRepository, CheckResultRepository, SlackGateway）。execute(contentCheckId: string, appBaseUrl: string): Promise<void> で (1) contentCheckRepository.findById で ContentCheck を取得（slackChannelId / slackThreadTs が null の場合は早期 return）、(2) checkResultRepository.findByContentCheckId で全結果を取得し error/warning/info 件数を集計、(3) サマリーテキスト（「チェック完了: エラー N件、警告 N件、情報 N件」）と詳細 URL（`${appBaseUrl}/checks/${contentCheckId}`）を組み立てて slackGateway.postMessage(channelId, threadTs, text) を呼び出す",
+        "wave": 3,
+        "done": false
+      },
+      {
+        "id": "slack-composition-update",
+        "description": "content-check.composition.ts に Slack 関連ファクトリ関数を追加。src/backend/contexts/content-check/presentation/composition/content-check.composition.ts を更新: createNotifySlackResultUseCase()（PrismaContentCheckRepository + PrismaCheckResultRepository + SlackWebApiGateway を注入）ファクトリ関数を追加する",
+        "wave": 3,
+        "done": false
+      },
+      {
+        "id": "slack-events-route",
+        "description": "Slack Events API Webhook エンドポイントの実装。src/app/api/slack/events/route.ts を新規作成（POST API Route）: (1) リクエストヘッダーから x-slack-signature と x-slack-request-timestamp を取得しリクエストボディを text() で読み取り verifySlackSignature() で署名検証（失敗時は 403 を返す）、(2) JSON.parse でペイロード解析し type === 'url_verification' の場合は { challenge } を JSON で即座に返す、(3) type === 'event_callback' かつ event.type === 'app_mention' の場合、メンション本文（event.text からボット ID 部分を除去）・channelId（event.channel）・threadTs（event.thread_ts ?? event.ts）を取得、(4) 即座に HTTP 200 を返す、(5) after()（next/server の unstable_after または waitUntil 相当）でバックグラウンド処理: createExecuteContentCheckUseCase().execute({ source: 'slack', originalText, slackChannelId, slackThreadTs }) を実行し完了後に createNotifySlackResultUseCase().execute(contentCheckId, APP_BASE_URL) を呼び出す。NEXT_PUBLIC_APP_URL 環境変数または process.env.VERCEL_URL を APP_BASE_URL に使用する",
+        "wave": 4,
+        "done": false
+      },
+      {
+        "id": "slack-unit-tests",
+        "description": "Slack 連携のユニットテスト追加。(1) src/backend/contexts/content-check/application/usecases/__tests__/notify-slack-result.usecase.test.ts: ContentCheckRepository・CheckResultRepository・SlackGateway をモック。正常系: slackChannelId/slackThreadTs が設定されている場合に postMessage が正しいテキストで呼ばれること。スキップ系: slackChannelId が null の場合は postMessage が呼ばれないこと。(2) src/lib/__tests__/slack-signature.test.ts: verifySlackSignature のユニットテスト（正常な署名、改ざんされた署名、古いタイムスタンプ）。vitest で全テスト pass を確認",
+        "wave": 4,
+        "done": false
+      }
+    ]
   }
 ]
