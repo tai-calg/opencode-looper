@@ -29,12 +29,13 @@ export function DeleteExpressionRuleButton({
 	const handleDelete = async () => {
 		setError(null);
 		setIsPending(true);
+		setOpen(false);
 
 		try {
 			await deleteExpressionRuleAction(ruleId);
-			setOpen(false);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : '削除に失敗しました。');
+			setOpen(true);
 		} finally {
 			setIsPending(false);
 		}
@@ -53,8 +54,7 @@ export function DeleteExpressionRuleButton({
 					<DialogTitle>表現ルールを削除</DialogTitle>
 				</DialogHeader>
 				<p className="text-sm text-muted-foreground">
-					「<span className="font-medium text-foreground">{ngExpression}</span>
-					」を削除します。この操作は取り消せません。
+					この表現ルールを削除します。この操作は取り消せません。
 				</p>
 				{error && <p className="text-sm text-destructive">{error}</p>}
 				<DialogFooter>
@@ -62,7 +62,7 @@ export function DeleteExpressionRuleButton({
 						キャンセル
 					</Button>
 					<Button type="button" variant="destructive" onClick={handleDelete} disabled={isPending}>
-						{isPending ? '削除中...' : '削除'}
+						{isPending ? '削除中...' : '削除する'}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

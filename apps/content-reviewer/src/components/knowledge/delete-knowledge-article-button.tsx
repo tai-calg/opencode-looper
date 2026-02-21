@@ -29,14 +29,15 @@ export function DeleteKnowledgeArticleButton({
 	const handleDelete = async () => {
 		setError(null);
 		setIsPending(true);
+		setOpen(false);
 
 		try {
 			const formData = new FormData();
 			formData.append('id', articleId);
 			await deleteKnowledgeArticleAction(formData);
-			setOpen(false);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : '削除に失敗しました。');
+			setOpen(true);
 		} finally {
 			setIsPending(false);
 		}
@@ -55,8 +56,7 @@ export function DeleteKnowledgeArticleButton({
 					<DialogTitle>ナレッジ記事を削除</DialogTitle>
 				</DialogHeader>
 				<p className="text-sm text-muted-foreground">
-					「<span className="font-medium text-foreground">{title}</span>
-					」を削除します。この操作は取り消せません。
+					このナレッジ記事を削除します。この操作は取り消せません。
 				</p>
 				{error && <p className="text-sm text-destructive">{error}</p>}
 				<DialogFooter>
