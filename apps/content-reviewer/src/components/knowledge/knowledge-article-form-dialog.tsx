@@ -2,11 +2,7 @@
 
 import { createKnowledgeArticleAction } from '@/backend/contexts/knowledge/presentation/actions/create-knowledge-article.action';
 import { updateKnowledgeArticleAction } from '@/backend/contexts/knowledge/presentation/actions/update-knowledge-article.action';
-<<<<<<< HEAD
 import type { KnowledgeArticleDto } from '@/backend/contexts/knowledge/presentation/loaders/knowledge-articles.loader';
-=======
-import type { KnowledgeArticleDTO } from '@/backend/contexts/knowledge/presentation/loaders/knowledge-articles.loader';
->>>>>>> 2e14ad8a790c4eeb080d80eb1d2b97efc83a09ac
 import { Button } from '@/components/ui/button';
 import {
 	Dialog,
@@ -23,11 +19,7 @@ import { Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
 
 interface KnowledgeArticleFormDialogProps {
-<<<<<<< HEAD
 	article?: KnowledgeArticleDto;
-=======
-	article?: KnowledgeArticleDTO;
->>>>>>> 2e14ad8a790c4eeb080d80eb1d2b97efc83a09ac
 }
 
 export function KnowledgeArticleFormDialog({ article }: KnowledgeArticleFormDialogProps) {

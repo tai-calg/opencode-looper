@@ -27,11 +27,7 @@ export async function createExpressionRuleAction(
 	input: CreateExpressionRuleActionInput,
 ): Promise<void> {
 	const currentUser = await loadCurrentUser();
-<<<<<<< HEAD
 	const userId = createUserId(currentUser?.id ?? '00000000-0000-0000-0000-000000000001');
-=======
-	const userId = createUserId(currentUser?.id ?? '00000000-0000-0000-0000-000000000000');
->>>>>>> 2e14ad8a790c4eeb080d80eb1d2b97efc83a09ac
 
 	const useCase = createCreateExpressionRuleUseCase();
 	await useCase.execute({
