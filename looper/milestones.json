@@ -380,42 +380,48 @@
         "id": "fix-checks-e2e-without-anthropic-key",
         "description": "E2E テスト checks.spec.ts の '/checks/new → /checks/[id] フロー' が ANTHROPIC_API_KEY 未設定環境で失敗する。根本原因: AnthropicAIGateway が ANTHROPIC_API_KEY=undefined でクライアントを初期化し、API 呼び出し時にエラーが発生。SSE の error イベントが返されてページが /checks/[id] にリダイレクトされず、waitForURL が90秒後にタイムアウトする。修正方針: apps/content-reviewer/src/backend/contexts/shared/infrastructure/ai/anthropic-ai.gateway.ts を修正し、ANTHROPIC_API_KEY が未設定の場合は generate() / generateWithWebSearch() が固定のダミーレスポンス（段落分割プロンプトには [{\"segmentIndex\":0,\"text\":\"テスト段落\"}] 形式の JSON、チェック系プロンプトには [{\"checkType\":\"fact_check\",\"severity\":\"info\",\"message\":\"テスト結果\",\"suggestion\":null}] 形式の JSON）を返すスタブ動作にする。または apps/content-reviewer/.env.local に ANTHROPIC_API_KEY=test を追加して anthropic SDK が起動できるようにした上で、execute-content-check.usecase.ts の AI 呼び出しを NODE_ENV=test の場合はダミーデータを返すようにする。最終的に checks.spec.ts のフローテストが pass すること。",
         "wave": 1,
+        "done": true
+      },
+      {
+        "id": "fix-content-check-nullable-userid",
+        "description": "E2E テスト checks.spec.ts が 'Foreign key constraint violated: content_checks_user_id_fkey' で失敗する。根本原因は3層に渡る設計の不整合: (1) execute-content-check.usecase.ts 68行目が userId=undefined 時に createUserId('00000000-0000-0000-0000-000000000000') にフォールバックし、users テーブルに存在しないUUIDでDB保存を試みる。(2) ContentCheck ドメインモデル（content-check.model.ts）の ContentCheckProps.userId が非nullable（UserId 型）だが Prisma スキーマでは String?（nullable）。(3) prisma-content-check.repository.ts の toDomain() が userId=null の場合に throw する。修正方針: (A) ContentCheckProps.userId を UserId | undefined に変更。ContentCheck.create() の props も userId?: UserId に変更。(B) prisma-content-check.repository.ts の toDomain() で userId が null の場合は undefined として扱う（throw しない）。toPrisma() で userId: contentCheck.userId as string | undefined を null に変換。(C) execute-content-check.usecase.ts のフォールバック（createUserId('00000000-0000-0000-0000-000000000000')）を除去し、userId=undefined のまま ContentCheck.create() に渡す。最終的に checks.spec.ts のフローテストが pass すること。",
+        "wave": 1,
         "done": false
       },
       {
         "id": "content-check-filter-repository",
         "description": "src/backend/contexts/content-check/infrastructure/repositories/prisma-content-check.repository.ts を更新: findAll(filter?) の where 条件に source フィルタ（filter.source があれば { source: filter.source as Source } を追加）と createdAt 範囲フィルタ（createdAfter/createdBefore があれば { createdAt: { gte: filter.createdAfter, lte: filter.createdBefore } } を追加）を対応させる。また toDomain() で ContentCheck に source フィールドを含めるよう ContentCheckProps と ContentCheck モデルも更新し、DB の source カラムを domain モデルに反映する",
-        "wave": 3,
+        "wave": 5,
         "done": false
       },
       {
         "id": "list-content-checks-usecase",
         "description": "src/backend/contexts/content-check/application/usecases/list-content-checks.usecase.ts を新規作成: ListContentChecksUseCase クラス（コンストラクタ DI: ContentCheckRepository, ContentSegmentRepository, CheckResultRepository）。execute(filter?: ContentCheckFilter): Promise<ContentCheckListDto> で (1) contentCheckRepository.findAll(filter) で一覧取得、(2) 各 ContentCheck の contentCheckId で segmentRepository.findByContentCheckId と checkResultRepository.findByContentCheckId を並列取得（Promise.all）、(3) 各チェックの segmentCount と summary（error/warning/info カウント）を集計して ContentCheckListItemDto を組み立て返却。src/backend/contexts/content-check/application/usecases/__tests__/list-content-checks.usecase.test.ts にユニットテストを追加（全 Repository をモック、正常系: フィルタなし一覧・source フィルタ・status フィルタの各ケースで DTO が正しく組み立てられることを検証）",
-        "wave": 3,
+        "wave": 4,
         "done": false
       },
       {
         "id": "check-history-table-component",
         "description": "src/components/dashboard/check-history-table.tsx を新規作成（Server Component）: ContentCheckListItemDto[] を props で受け取り、shadcn/ui Table を使って一覧表示。カラム構成: ソース種別（Web/Slack バッジ）・ステータス（pending/processing/completed/failed をカラーバッジ）・サマリー（error/warning/info 件数）・実行日時（日本語フォーマット）・操作（詳細へリンク）。各行全体が /checks/[id] へのリンク（Next.js Link）になっていること。データが0件の場合は「チェック履歴がありません」を表示",
-        "wave": 3,
+        "wave": 4,
         "done": false
       },
       {
         "id": "check-history-filter-component",
         "description": "src/components/dashboard/check-history-filter.tsx を新規作成（'use client'）: ソース種別（全て/Web/Slack）・ステータス（全て/pending/processing/completed/failed）・実行日時範囲（開始日・終了日）のフィルタ UI。shadcn/ui の Select と Input（type=date）を使用。フィルタ変更時は useRouter + router.push で ?source=web&status=completed&from=2024-01-01&to=2024-01-31 形式の searchParams を URL に反映する（Client Component による URL クエリパラメータ操作）",
-        "wave": 3,
+        "wave": 4,
         "done": false
       },
       {
         "id": "dashboard-composition-and-loader",
         "description": "content-check.composition.ts を更新して createListContentChecksUseCase()（PrismaContentCheckRepository + PrismaContentSegmentRepository + PrismaCheckResultRepository を注入）ファクトリ関数を追加。src/backend/contexts/content-check/presentation/loaders/list-content-checks.loader.ts を新規作成: loadContentCheckList(filter?: { source?: string; status?: string; from?: string; to?: string }): Promise<ContentCheckListDto>。searchParams の文字列を ContentCheckFilter 型に変換（source/status の型キャスト、from/to を Date に変換）して createListContentChecksUseCase().execute() を呼び出す",
-        "wave": 4,
+        "wave": 5,
         "done": false
       },
       {
         "id": "dashboard-page",
         "description": "src/app/(app)/page.tsx を更新（Server Component）: searchParams から source/status/from/to を受け取り loadContentCheckList(filter) を呼び出して ContentCheckListDto を取得。CheckHistoryFilter コンポーネント（フィルタ UI）と CheckHistoryTable コンポーネント（一覧テーブル）を配置。ページタイトル「チェック履歴」と「新規チェック」ボタン（/checks/new へのリンク）を上部に表示。e2e/dashboard.spec.ts を新規作成: / にアクセスしてチェック履歴テーブルが表示されることを確認・フィルタ（ソース種別 Select）を変更すると URL が更新されテーブル内容が変わること・各行クリックで /checks/[id] に遷移すること・完全な E2E シナリオ（/checks/new でチェック実行 → 完了 → / に戻って履歴に表示されていること）を確認する基本シナリオを追加",
-        "wave": 4,
+        "wave": 5,
         "done": false
       }
     ]
