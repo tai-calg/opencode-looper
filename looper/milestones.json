@@ -360,19 +360,19 @@
         "id": "execute-content-check-sse",
         "description": "SSE ストリーミングエンドポイントの実装。src/app/api/checks/execute/route.ts を新規作成（POST API Route）: リクエストボディから originalText・source を取得、ReadableStream を生成し SSEフォーマット（data: ${JSON.stringify(event)}\\n\\n）で onProgress コールバックのイベント（segments_created, check_started, check_completed, completed, error）を書き出す。createExecuteContentCheckUseCase() を content-check.composition.ts から取得して execute() を呼び出す。開発環境（NODE_ENV=development）ではダミーユーザー ID を使用、本番環境では Supabase Auth セッションから userId を取得。レスポンスは Content-Type: text/event-stream, Cache-Control: no-cache で返す",
         "wave": 5,
-        "done": false
+        "done": true
       },
       {
         "id": "checks-new-page-ui",
         "description": "/checks/new ページの UI 実装。(1) src/components/checks/check-form.tsx を新規作成（'use client'）: shadcn/ui Textarea でテキスト入力（30000字カウンタ表示）、送信ボタン押下で fetch('/api/checks/execute', { method: 'POST', body: JSON.stringify({ originalText, source: 'web' }) }) を呼び出し ReadableStream reader で SSE イベントを consume、segments_created 受信後に段落数を表示、check_started/check_completed 受信でチェック種別（5種）ごとのステータスバッジ（waiting→running→done）をリアルタイム更新、completed 受信後に router.push(`/checks/${contentCheckId}`) でリダイレクト、error 受信時はエラーメッセージ表示。(2) src/app/(app)/checks/new/page.tsx（Server Component）を更新し CheckForm コンポーネントをレンダリング",
         "wave": 5,
-        "done": false
+        "done": true
       },
       {
         "id": "checks-detail-page-ui",
         "description": "/checks/[id] 詳細ページの UI 実装。(1) src/components/checks/check-result-summary.tsx を新規作成（Server Component）: error/warning/info の件数をバッジ表示するサマリー統計コンポーネント。(2) src/components/checks/check-result-segment.tsx を新規作成（Server Component）: セグメントテキストと そのセグメントの CheckResult 一覧（checkType ラベル・severity バッジ（error=red, warning=yellow, info=blue）・message・suggestion）を表示。(3) src/app/(app)/checks/[id]/page.tsx を更新（Server Component）: loadContentCheckDetail(params.id) で ContentCheckDetailDto を取得し CheckResultSummary と全 CheckResultSegment コンポーネントを表示（ID 不正時は notFound()）。(4) e2e/checks.spec.ts を新規作成: /checks/new でテキスト入力・送信 → SSE 進捗表示（段落数・チェック種別ステータス）→ 完了後 /checks/[id] へリダイレクト → セグメントごとの結果詳細が表示されることを確認する基本 E2E シナリオを追加",
         "wave": 5,
-        "done": false
+        "done": true
       },
       {
         "id": "verify-milestone6",
@@ -384,6 +384,12 @@
         "id": "fix-knowledge-import-error-handling",
         "description": "E2E テスト knowledge-import.spec.ts が失敗する。根本原因: apps/content-reviewer/src/app/(app)/knowledge/import/page.tsx が loadNoteArticles() を呼び出す際にエラーハンドリングがなく、NoteScraperHttpGateway.fetchArticleList() が HTTP 404 を返すと未処理エラーになりページクラッシュする。修正方針: page.tsx の loadNoteArticles() 呼び出しを try-catch で囲み、エラー時は articles=[] または errorMessage を state にセットして「記事が見つかりませんでした。」または「取得に失敗しました。」を表示する。またはローダー側でエラーをキャッチして空配列を返す。E2E テストが期待している getByRole('table').or(getByText('記事が見つかりませんでした。')) が visible になれば pass する",
         "wave": 7,
+        "done": false
+      },
+      {
+        "id": "fix-content-check-dummy-user-fk-violation",
+        "description": "E2E テスト checks.spec.ts のフローテストが失敗する。根本原因: apps/content-reviewer/src/app/api/checks/execute/route.ts が NODE_ENV=development 時にダミーユーザー ID (00000000-0000-0000-0000-000000000000) を ContentCheck に設定して save しようとするが、users テーブルにそのユーザーが存在しないため prisma.contentCheck.upsert() が外部キー制約違反 (content_checks_user_id_fkey) で失敗する。修正方針: ContentCheck.userId は nullable (userId?: UserId) であるため、NODE_ENV=development 時は userId を undefined のまま execute() に渡し、DB に null で保存されるようにする。route.ts から createUserId(DUMMY_USER_ID) の呼び出しを開発環境では行わず、userId を undefined にする。",
+        "wave": 8,
         "done": false
       }
     ]
