@@ -369,7 +369,50 @@
     "goal": "ダッシュボード（/）に過去のチェック履歴一覧が表示され、ソース種別（Web / Slack）・ステータス・実行日時でフィルタリングでき、各行クリックで /checks/[id] の詳細ページに遷移できる",
     "verification": "pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm exec playwright test",
     "done": false,
-    "tasks": []
+    "tasks": [
+      {
+        "id": "dashboard-contracts",
+        "description": "ダッシュボード一覧用の共有型定義。(1) src/backend/contexts/content-check/domain/gateways/content-check.repository.ts の ContentCheckFilter に source?: 'web' | 'slack' と createdAfter?: Date, createdBefore?: Date を追加。(2) src/backend/contexts/content-check/application/usecases/content-check-list.dto.ts を新規作成: ContentCheckListItemDto（plain object: { id: string; source: 'web' | 'slack'; status: string; createdAt: Date; segmentCount: number; summary: { error: number; warning: number; info: number } }）と ContentCheckListDto（items: ContentCheckListItemDto[]）を定義。W2 以降の UseCase・UI タスクが全てこの型を参照する",
+        "wave": 1,
+        "done": false
+      },
+      {
+        "id": "content-check-filter-repository",
+        "description": "src/backend/contexts/content-check/infrastructure/repositories/prisma-content-check.repository.ts を更新: findAll(filter?) の where 条件に source フィルタ（filter.source があれば { source: filter.source as Source } を追加）と createdAt 範囲フィルタ（createdAfter/createdBefore があれば { createdAt: { gte: filter.createdAfter, lte: filter.createdBefore } } を追加）を対応させる。また toDomain() で ContentCheck に source フィールドを含めるよう ContentCheckProps と ContentCheck モデルも更新し、DB の source カラムを domain モデルに反映する",
+        "wave": 2,
+        "done": false
+      },
+      {
+        "id": "list-content-checks-usecase",
+        "description": "src/backend/contexts/content-check/application/usecases/list-content-checks.usecase.ts を新規作成: ListContentChecksUseCase クラス（コンストラクタ DI: ContentCheckRepository, ContentSegmentRepository, CheckResultRepository）。execute(filter?: ContentCheckFilter): Promise<ContentCheckListDto> で (1) contentCheckRepository.findAll(filter) で一覧取得、(2) 各 ContentCheck の contentCheckId で segmentRepository.findByContentCheckId と checkResultRepository.findByContentCheckId を並列取得（Promise.all）、(3) 各チェックの segmentCount と summary（error/warning/info カウント）を集計して ContentCheckListItemDto を組み立て返却。src/backend/contexts/content-check/application/usecases/__tests__/list-content-checks.usecase.test.ts にユニットテストを追加（全 Repository をモック、正常系: フィルタなし一覧・source フィルタ・status フィルタの各ケースで DTO が正しく組み立てられることを検証）",
+        "wave": 2,
+        "done": false
+      },
+      {
+        "id": "check-history-table-component",
+        "description": "src/components/dashboard/check-history-table.tsx を新規作成（Server Component）: ContentCheckListItemDto[] を props で受け取り、shadcn/ui Table を使って一覧表示。カラム構成: ソース種別（Web/Slack バッジ）・ステータス（pending/processing/completed/failed をカラーバッジ）・サマリー（error/warning/info 件数）・実行日時（日本語フォーマット）・操作（詳細へリンク）。各行全体が /checks/[id] へのリンク（Next.js Link）になっていること。データが0件の場合は「チェック履歴がありません」を表示",
+        "wave": 2,
+        "done": false
+      },
+      {
+        "id": "check-history-filter-component",
+        "description": "src/components/dashboard/check-history-filter.tsx を新規作成（'use client'）: ソース種別（全て/Web/Slack）・ステータス（全て/pending/processing/completed/failed）・実行日時範囲（開始日・終了日）のフィルタ UI。shadcn/ui の Select と Input（type=date）を使用。フィルタ変更時は useRouter + router.push で ?source=web&status=completed&from=2024-01-01&to=2024-01-31 形式の searchParams を URL に反映する（Client Component による URL クエリパラメータ操作）",
+        "wave": 2,
+        "done": false
+      },
+      {
+        "id": "dashboard-composition-and-loader",
+        "description": "content-check.composition.ts を更新して createListContentChecksUseCase()（PrismaContentCheckRepository + PrismaContentSegmentRepository + PrismaCheckResultRepository を注入）ファクトリ関数を追加。src/backend/contexts/content-check/presentation/loaders/list-content-checks.loader.ts を新規作成: loadContentCheckList(filter?: { source?: string; status?: string; from?: string; to?: string }): Promise<ContentCheckListDto>。searchParams の文字列を ContentCheckFilter 型に変換（source/status の型キャスト、from/to を Date に変換）して createListContentChecksUseCase().execute() を呼び出す",
+        "wave": 3,
+        "done": false
+      },
+      {
+        "id": "dashboard-page",
+        "description": "src/app/(app)/page.tsx を更新（Server Component）: searchParams から source/status/from/to を受け取り loadContentCheckList(filter) を呼び出して ContentCheckListDto を取得。CheckHistoryFilter コンポーネント（フィルタ UI）と CheckHistoryTable コンポーネント（一覧テーブル）を配置。ページタイトル「チェック履歴」と「新規チェック」ボタン（/checks/new へのリンク）を上部に表示。e2e/dashboard.spec.ts を新規作成: / にアクセスしてチェック履歴テーブルが表示されることを確認・フィルタ（ソース種別 Select）を変更すると URL が更新されテーブル内容が変わること・各行クリックで /checks/[id] に遷移すること・完全な E2E シナリオ（/checks/new でチェック実行 → 完了 → / に戻って履歴に表示されていること）を確認する基本シナリオを追加",
+        "wave": 3,
+        "done": false
+      }
+    ]
   },
   {
     "milestone": 8,
