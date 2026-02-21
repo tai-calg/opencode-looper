@@ -94,3 +94,4 @@ git add looper/milestones.json && git commit -m "chore: Milestone __MILESTONE__ 
 - description は具体的に（どのディレクトリにどのファイルを作るか分かるレベル）
 - 同一 Wave の task 数は最大 8 個
 - id は kebab-case で一意にする
+- **検証タスク（verify-milestone 等）は作らない。** 検証は Verifier エージェントが毎 Wave 後に自動実行する

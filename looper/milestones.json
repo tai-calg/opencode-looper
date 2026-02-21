@@ -1,9 +1,11 @@
-[{
+[
+  {
     "milestone": 1,
     "goal": "pnpm workspace + Next.js App Router プロジェクトが起動し、Biome lint / typecheck / build が通り、shadcn/ui + Tailwind CSS でレイアウト（サイドバー + ヘッダー）が表示され、Prisma スキーマに全テーブルが定義されて prisma generate が成功する",
     "verification": "pnpm lint && pnpm typecheck && pnpm build",
     "done": true,
-    "tasks": [{
+    "tasks": [
+      {
         "id": "project-scaffold",
         "description": "pnpm workspace + Next.js App Router プロジェクトの初期構築。ルート package.json（workspace scripts: lint, typecheck, build）、pnpm-workspace.yaml、apps/content-reviewer/ 配下に package.json・next.config.ts・tsconfig.json・tailwind.config.ts・postcss.config.mjs・biome.json を作成し、Tailwind CSS v4 + PostCSS を設定、apps/content-reviewer/src/app/globals.css に Tailwind ディレクティブを記述、最小限の app/layout.tsx と app/page.tsx で pnpm build が通る状態にする",
         "wave": 1,
@@ -32,12 +34,6 @@
         "description": "全ルートのスタブページを作成: app/page.tsx（ダッシュボード）、app/login/page.tsx、app/checks/new/page.tsx、app/checks/[id]/page.tsx、app/rules/page.tsx、app/knowledge/page.tsx、app/knowledge/import/page.tsx。各ページはページタイトルのみ表示する Server Component とし、app-shell レイアウトでラップされた状態にする",
         "wave": 3,
         "done": true
-      },
-      {
-        "id": "verify-milestone1",
-        "description": "pnpm lint && pnpm typecheck && pnpm build を実行し全て成功することを確認。prisma generate が成功することを確認。Biome lint エラー・TypeScript 型エラー・ビルドエラーがあれば全て修正する",
-        "wave": 4,
-        "done": true
       }
     ]
   },
@@ -46,7 +42,8 @@
     "goal": "Supabase Auth による Google OAuth ログイン・ログアウトが動作し、未認証時は /login にリダイレクトされ、開発環境（NODE_ENV=development）では認証スキップでダミーユーザーとしてダッシュボード（空の / ページ）にアクセスできる",
     "verification": "pnpm lint && pnpm typecheck && pnpm build && pnpm test",
     "done": true,
-    "tasks": [{
+    "tasks": [
+      {
         "id": "auth-deps-and-test-setup",
         "description": "apps/content-reviewer/package.json に @supabase/supabase-js, @supabase/ssr, vitest を追加し pnpm install を実行。apps/content-reviewer/vitest.config.ts を作成（src/ 配下のテストを対象、パスエイリアス @/ を設定）。apps/content-reviewer/package.json に test script（vitest run）を追加。ルート package.json に test script（pnpm -r run test）を追加",
         "wave": 1,
@@ -99,12 +96,6 @@
         "description": "開発環境（NODE_ENV=development）で / にアクセスすると Missing environment variable: NEXT_PUBLIC_SUPABASE_URL エラーが発生する。原因: (app)/layout.tsx が loadCurrentUser() → createGetCurrentUserUseCase() → createSupabaseServerClient() を呼び出し、Supabase 環境変数が未設定のためクラッシュする。修正方針: current-user.loader.ts の loadCurrentUser() 先頭で NODE_ENV === 'development' を判定し、User.createDummy() を返すことで Supabase 接続をバイパスする。同様に sign-in.action.ts と sign-out.action.ts にも開発環境ガードを追加する（開発環境ではリダイレクトのみ）",
         "wave": 5,
         "done": true
-      },
-      {
-        "id": "verify-milestone2",
-        "description": "pnpm lint && pnpm typecheck && pnpm build && pnpm test を実行し全て成功することを確認。開発環境（NODE_ENV=development）で認証スキップが動作し / にアクセスできることを確認。Biome lint エラー・TypeScript 型エラー・ビルドエラー・テスト失敗があれば全て修正する",
-        "wave": 6,
-        "done": true
       }
     ]
   },
@@ -113,7 +104,8 @@
     "goal": "/rules ページで表現ルール（NG表現→推奨表現）の一覧表示・新規登録・編集・削除ができ、ExpressionRule ドメインモデル → PrismaExpressionRuleRepository → UseCase（CRUD 4種） → Server Actions → UI の全レイヤーが縦に通って DB に永続化される",
     "verification": "pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm exec playwright test",
     "done": true,
-    "tasks": [{
+    "tasks": [
+      {
         "id": "expression-rule-contracts",
         "description": "expression-rule context の契約定義。src/backend/contexts/shared/domain/models/expression-rule-id.model.ts に ExpressionRuleId branded type（createExpressionRuleId ファクトリ + UUID バリデーション）を作成。src/backend/contexts/expression-rule/domain/models/expression-rule.model.ts に ExpressionRule クラスの型定義（ExpressionRuleProps interface: id, ngExpression, recommendedExpression, description, isActive, createdBy, createdAt, updatedAt）と Result 型を定義。src/backend/contexts/expression-rule/domain/gateways/expression-rule.repository.ts に ExpressionRuleRepository interface（save, findById, findAll, findActive, delete）をドメインモデル型のみで定義",
         "wave": 1,
@@ -162,12 +154,6 @@
         "done": true
       },
       {
-        "id": "verify-milestone3",
-        "description": "pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm exec playwright test を実行し全て成功することを確認。Biome lint エラー・TypeScript 型エラー・ビルドエラー・テスト失敗・E2E テスト失敗があれば全て修正する",
-        "wave": 4,
-        "done": true
-      },
-      {
         "id": "fix-create-usecase-test-type-error",
         "description": "typecheck エラーの修正。原因: test/unit/contexts/expression-rule/application/usecases/create-expression-rule.usecase.test.ts が CreateExpressionRuleInput に 'id' フィールドを渡しているが、最終的な UseCase 実装（UUID自動生成方式）では 'id' が input に含まれない。コンフリクト解決の結果 expression-rule-usecase-tests ブランチの実装（UUID自動生成）を採用したが、expression-rule-usecases ブランチのテストファイル（test/unit/ 配下）が古い設計のままになっている。修正方針: test/unit/.../ create-expression-rule.usecase.test.ts の各 execute() 呼び出しから 'id' フィールドを削除し、result.id のアサーションは UUID 形式（expect(result.id).toMatch(/^[0-9a-f-]{36}$/)）に変更する",
         "wave": 5,
@@ -180,7 +166,8 @@
     "goal": "/knowledge ページでナレッジ記事の一覧表示・手動登録・編集ができ、保存時に OpenAI Embeddings API で Embedding が自動生成されて pgvector に格納され、KnowledgeArticle / KnowledgeEmbedding ドメインモデル → Repository → UseCase → UI が動作する",
     "verification": "pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm exec playwright test",
     "done": true,
-    "tasks": [{
+    "tasks": [
+      {
         "id": "knowledge-contracts",
         "description": "knowledge context の契約定義。src/backend/contexts/shared/domain/models/knowledge-article-id.model.ts（KnowledgeArticleId branded type + UUID バリデーション）、knowledge-embedding-id.model.ts（KnowledgeEmbeddingId branded type）を作成。src/backend/contexts/shared/domain/gateways/embedding.gateway.ts に EmbeddingGateway interface（generateEmbedding(text: string): Promise<number[]>）を定義。src/backend/contexts/knowledge/domain/models/knowledge-article.model.ts に KnowledgeArticleProps interface と Result 型の型定義のみを記述。src/backend/contexts/knowledge/domain/models/knowledge-embedding.model.ts に KnowledgeEmbeddingProps interface と型定義のみを記述。src/backend/contexts/knowledge/domain/gateways/knowledge-article.repository.ts に KnowledgeArticleRepository interface（save, findById, findAll, delete）を定義。src/backend/contexts/knowledge/domain/gateways/knowledge-embedding.repository.ts に KnowledgeEmbeddingRepository interface（saveMany, deleteByArticleId, searchSimilar）を定義",
         "wave": 1,
@@ -253,7 +240,8 @@
     "goal": "/knowledge/import で note アカウント名を入力すると NoteScraperGateway 経由で記事一覧が表示され、選択した記事の本文を取得して DB に保存し Embedding を生成できる",
     "verification": "pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm exec playwright test",
     "done": true,
-    "tasks": [{
+    "tasks": [
+      {
         "id": "note-scraper-contract",
         "description": "src/backend/contexts/knowledge/domain/gateways/note-scraper.gateway.ts を新規作成し、NoteArticleSummary 型（title: string, url: string, publishedAt: Date）と NoteScraperGateway interface（fetchArticleList(accountName: string): Promise<NoteArticleSummary[]>、fetchArticleContent(url: string): Promise<{ title: string; content: string }>）を定義する",
         "wave": 1,
@@ -290,12 +278,6 @@
         "done": true
       },
       {
-        "id": "verify-milestone5",
-        "description": "pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm exec playwright test を実行し全て成功することを確認。Biome lint エラー・TypeScript 型エラー・ビルドエラー・テスト失敗・E2E テスト失敗があれば全て修正する",
-        "wave": 5,
-        "done": false
-      },
-      {
         "id": "fix-domain-model-serialization",
         "description": "E2E テストが 'Only plain objects, and a few built-ins, can be passed to Client Components from Server Components. Classes or null prototypes are not supported.' エラーで失敗する。原因: loadExpressionRules()（expression-rule.loader.ts）と loadKnowledgeArticles()（knowledge-articles.loader.ts）が ExpressionRule / KnowledgeArticle クラスインスタンスをそのまま返しており、page.tsx が Client Component（ExpressionRuleTable, KnowledgeArticleTable）に props として渡す際に Next.js のシリアライズエラーが発生する。修正方針: 各 loader で Domain Model を plain object の DTO に変換して返す。(1) ExpressionRuleProps に相当する plain type（ExpressionRuleDto）を定義し、expression-rule.loader.ts で ExpressionRule インスタンスを { id: rule.id, ngExpression: rule.ngExpression, ... } のスプレッド/明示変換でプレーンオブジェクトに変換して返す。(2) 同様に KnowledgeArticleDto を定義し、knowledge-articles.loader.ts でも変換する。(3) ExpressionRuleTable と KnowledgeArticleTable の props 型を DTO 型に変更し、型整合性を確認する。DTO 型は presentation 層（loaders ディレクトリ内または別の types ファイル）に配置する",
         "wave": 6,
@@ -308,7 +290,8 @@
     "goal": "/checks/new でテキストを入力して送信すると、AIGateway による段落分割→5種のチェック（ファクトチェック・ナレッジ整合性・表現ルール適合・炎上リスク・文章クオリティ）が並列実行され、SSE で進捗がリアルタイム表示され、完了後 /checks/[id] で結果詳細（セグメントごとの指摘・severity・修正提案）を確認できる",
     "verification": "pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm exec playwright test",
     "done": false,
-    "tasks": [{
+    "tasks": [
+      {
         "id": "content-check-contracts",
         "description": "content-check context の全契約定義（W2以降の全タスクが参照する）。(1) src/backend/contexts/shared/domain/models/ に ContentCheckId・ContentSegmentId・CheckResultId の各 branded type（createXxxId ファクトリ + UUID バリデーション）を追加。(2) src/backend/contexts/shared/domain/gateways/ai.gateway.ts を新規作成（AIGateway interface: generate(prompt, options?): Promise<string>、generateWithWebSearch(prompt, options?): Promise<string>、generateStream(prompt, options?): AsyncGenerator<string> + GenerateOptions 型）。(3) src/backend/contexts/content-check/domain/models/content-check.model.ts に ContentCheckProps interface・CheckStatus type ('pending'|'processing'|'completed'|'failed')・Result型・ContentCheck クラス骨格（create/reconstruct/startProcessing/complete/fail のメソッドシグネチャ、ボディは throw new Error('not implemented')）を定義。(4) content-segment.model.ts に ContentSegmentProps + ContentSegment クラス骨格を定義。(5) check-result.model.ts に CheckType type ('fact_check'|'knowledge_consistency'|'expression_rule'|'risk_assessment'|'quality')・Severity type ('info'|'warning'|'error')・CheckResultProps・CheckResult クラス骨格を定義。(6) src/backend/contexts/content-check/domain/gateways/ に ContentCheckFilter 型・ContentCheckRepository（save, findById, findAll(filter)）・ContentSegmentRepository（saveMany, findByContentCheckId）・CheckResultRepository（saveMany, findBySegmentId, findByContentCheckId）・ExpressionRuleProvider（findActiveRules(): Promise<{ngExpression: string; recommendedExpression: string}[]>）・KnowledgeSearchGateway（searchSimilar(embedding: number[], limit: number): Promise<{chunkText: string}[]>）の各 interface ファイルを新規作成する",
         "wave": 1,
@@ -375,21 +358,21 @@
         "done": true
       },
       {
-        "id": "verify-milestone6",
-        "description": "pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm exec playwright test を実行し全て成功することを確認。Biome lint エラー・TypeScript 型エラー・ビルドエラー・テスト失敗・E2E テスト失敗があれば全て修正する",
-        "wave": 7,
-        "done": false
-      },
-      {
         "id": "fix-knowledge-import-error-handling",
         "description": "E2E テスト knowledge-import.spec.ts が失敗する。根本原因: apps/content-reviewer/src/app/(app)/knowledge/import/page.tsx が loadNoteArticles() を呼び出す際にエラーハンドリングがなく、NoteScraperHttpGateway.fetchArticleList() が HTTP 404 を返すと未処理エラーになりページクラッシュする。修正方針: page.tsx の loadNoteArticles() 呼び出しを try-catch で囲み、エラー時は articles=[] または errorMessage を state にセットして「記事が見つかりませんでした。」または「取得に失敗しました。」を表示する。またはローダー側でエラーをキャッチして空配列を返す。E2E テストが期待している getByRole('table').or(getByText('記事が見つかりませんでした。')) が visible になれば pass する",
         "wave": 6,
-        "done": false
+        "done": true
       },
       {
         "id": "fix-content-check-dummy-user-fk-violation",
         "description": "E2E テスト checks.spec.ts のフローテストが失敗する。根本原因: apps/content-reviewer/src/app/api/checks/execute/route.ts が NODE_ENV=development 時にダミーユーザー ID (00000000-0000-0000-0000-000000000000) を ContentCheck に設定して save しようとするが、users テーブルにそのユーザーが存在しないため prisma.contentCheck.upsert() が外部キー制約違反 (content_checks_user_id_fkey) で失敗する。修正方針: ContentCheck.userId は nullable (userId?: UserId) であるため、NODE_ENV=development 時は userId を undefined のまま execute() に渡し、DB に null で保存されるようにする。route.ts から createUserId(DUMMY_USER_ID) の呼び出しを開発環境では行わず、userId を undefined にする。",
         "wave": 6,
+        "done": true
+      },
+      {
+        "id": "fix-execute-content-check-usecase-dummy-user",
+        "description": "E2E テスト checks.spec.ts フローテストが FK 制約違反で失敗し続ける。根本原因: route.ts の修正（userId=undefined を渡す）は完了しているが、execute-content-check.usecase.ts の execute() 内 line 68 に `const effectiveUserId = userId ?? createUserId('00000000-0000-0000-0000-000000000000');` というフォールバックが残っており、userId が undefined のとき users テーブルに存在しないダミー UUID を ContentCheck に設定して DB に保存しようとするため FK 制約違反が発生する。修正方針: (1) ContentCheck.create() の props から userId を optional（userId?: UserId）に変更し、ContentCheckProps も同様に更新する。(2) execute-content-check.usecase.ts の effectiveUserId フォールバックを削除し、userId を undefined のまま ContentCheck.create() に渡す。(3) PrismaContentCheckRepository.toPrisma() で userId が undefined の場合に null を返すよう修正（userId: contentCheck.userId as string → userId: contentCheck.userId ? contentCheck.userId as string : null）。(4) PrismaContentCheckRepository.toDomain() で userId が null の場合に throw しないよう修正（userId が null なら undefined を渡す）。これにより開発環境では userId=null で ContentCheck が DB に保存され FK 制約違反が解消される。",
+        "wave": 7,
         "done": false
       }
     ]

@@ -132,8 +132,7 @@ lsof -ti:3000 | xargs kill -9 2>/dev/null || true
    ```json
    {"id": "fix-具体的な内容", "description": "エラー原因と修正方針を具体的に記述", "wave": N, "done": false}
    ```
-   wave は `verify-milestone*` タスクの **現在の wave と同じ値** にする。
-   同時に、その `verify-milestone*` タスク自身 **および** それより wave が大きい未完了タスク全ての wave を **+1** する（fix → verify の実行順序を保証するため）。
+   wave は **検証失敗した wave N** にする。同時に、wave >= N の未完了タスク全ての wave を **+1** する（fix を先に実行してから後続を再開するため）。
 4. 変更をコミットする:
    ```
    git add -A && git commit -m "chore: Milestone __MILESTONE__ verification failed — fix tasks added"
