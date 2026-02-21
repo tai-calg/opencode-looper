@@ -179,7 +179,7 @@
     "milestone": 4,
     "goal": "/knowledge ページでナレッジ記事の一覧表示・手動登録・編集ができ、保存時に OpenAI Embeddings API で Embedding が自動生成されて pgvector に格納され、KnowledgeArticle / KnowledgeEmbedding ドメインモデル → Repository → UseCase → UI が動作する",
     "verification": "pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm exec playwright test",
-    "done": false,
+    "done": true,
     "tasks": [{
         "id": "knowledge-contracts",
         "description": "knowledge context の契約定義。src/backend/contexts/shared/domain/models/knowledge-article-id.model.ts（KnowledgeArticleId branded type + UUID バリデーション）、knowledge-embedding-id.model.ts（KnowledgeEmbeddingId branded type）を作成。src/backend/contexts/shared/domain/gateways/embedding.gateway.ts に EmbeddingGateway interface（generateEmbedding(text: string): Promise<number[]>）を定義。src/backend/contexts/knowledge/domain/models/knowledge-article.model.ts に KnowledgeArticleProps interface と Result 型の型定義のみを記述。src/backend/contexts/knowledge/domain/models/knowledge-embedding.model.ts に KnowledgeEmbeddingProps interface と型定義のみを記述。src/backend/contexts/knowledge/domain/gateways/knowledge-article.repository.ts に KnowledgeArticleRepository interface（save, findById, findAll, delete）を定義。src/backend/contexts/knowledge/domain/gateways/knowledge-embedding.repository.ts に KnowledgeEmbeddingRepository interface（saveMany, deleteByArticleId, searchSimilar）を定義",
@@ -232,31 +232,19 @@
         "id": "knowledge-presentation",
         "description": "knowledge context の presentation 層を実装。src/backend/contexts/knowledge/presentation/composition/knowledge-article.composition.ts に createListKnowledgeArticlesUseCase / createCreateKnowledgeArticleUseCase / createUpdateKnowledgeArticleUseCase / createDeleteKnowledgeArticleUseCase ファクトリ関数（PrismaKnowledgeArticleRepository + PrismaKnowledgeEmbeddingRepository + OpenAIEmbeddingGateway + prisma を注入）。src/backend/contexts/knowledge/presentation/loaders/knowledge-articles.loader.ts に loadKnowledgeArticles()（UseCase 経由で一覧取得）。src/backend/contexts/knowledge/presentation/actions/create-knowledge-article.action.ts、update-knowledge-article.action.ts、delete-knowledge-article.action.ts に 'use server' Server Actions（FormData → UseCase 呼び出し → revalidatePath('/knowledge')）。開発環境ではダミーユーザー ID を使用",
         "wave": 4,
-        "done": false
+        "done": true
       },
       {
         "id": "knowledge-ui",
         "description": "shadcn/ui コンポーネント追加（Textarea, ScrollArea 等が未追加なら追加）。src/components/knowledge/knowledge-article-table.tsx（'use client'、一覧テーブル: タイトル・ソース種別・作成日・操作ボタン）、knowledge-article-form-dialog.tsx（'use client'、新規登録/編集兼用の Dialog フォーム: title, content, sourceUrl 入力 → Server Action 呼び出し）、delete-knowledge-article-button.tsx（'use client'、削除確認付きボタン → Server Action 呼び出し）を作成。src/app/(app)/knowledge/page.tsx を更新し、loadKnowledgeArticles() で一覧取得 → KnowledgeArticleTable に props 渡し + 新規登録ボタン配置。e2e/knowledge.spec.ts に /knowledge ページの E2E テスト（一覧表示・新規登録→一覧反映・編集・削除の基本シナリオ）を追加",
         "wave": 5,
-        "done": false
-      },
-      {
-        "id": "verify-milestone4",
-        "description": "pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm exec playwright test を実行し全て成功することを確認。Biome lint エラー・TypeScript 型エラー・ビルドエラー・テスト失敗・E2E テスト失敗があれば全て修正する",
-        "wave": 6,
-        "done": false
-      },
-      {
-        "id": "fix-e2e-next-build-conflict",
-        "description": "E2E テストが Runtime Error で失敗する問題を修正する。原因: pnpm build（本番ビルド）実行後に pnpm e2e を実行すると playwright.config.ts の webServer.command である pnpm dev が .next/ ディレクトリの不完全な状態で起動し、'ENOENT: no such file or directory, open .../.next/server/pages/_document.js' エラーが発生してページが表示されない。修正方針: playwright.config.ts の webServer.command を 'pnpm dev' から '.next/ を削除してから pnpm dev を起動するコマンド' に変更するか、または pnpm verify の e2e 実行前に .next/ をクリアするステップを追加する（例: 'rm -rf .next && pnpm dev'）。あるいは webServer を 'next build && next start' に変更して本番ビルドのサーバーで E2E を実行することも検討する",
-        "wave": 7,
-        "done": false
+        "done": true
       },
       {
         "id": "fix-knowledge-embedding-repository-test-dimensions",
         "description": "prisma-knowledge-embedding.repository.test.ts の sampleEmbeddingValues が Array.from({ length: 3 }, ...) で3次元になっており、KnowledgeEmbedding.create() の1536次元バリデーションで失敗している。修正方針: sampleEmbeddingValues を Array.from({ length: 1536 }, (_, i) => (i + 1) * 0.001) に変更する。また searchSimilar テストの rawRows.embedding も '[0.1,0.2,...（1536次元分）]' に更新する（reconstruct はバリデーションなしなので現状は通るが、正しいテストデータにする）",
         "wave": 8,
-        "done": false
+        "done": true
       }
     ]
   },
@@ -264,15 +252,141 @@
     "milestone": 5,
     "goal": "/knowledge/import で note アカウント名を入力すると NoteScraperGateway 経由で記事一覧が表示され、選択した記事の本文を取得して DB に保存し Embedding を生成できる",
     "verification": "pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm exec playwright test",
-    "done": false,
-    "tasks": []
+    "done": true,
+    "tasks": [{
+        "id": "note-scraper-contract",
+        "description": "src/backend/contexts/knowledge/domain/gateways/note-scraper.gateway.ts を新規作成し、NoteArticleSummary 型（title: string, url: string, publishedAt: Date）と NoteScraperGateway interface（fetchArticleList(accountName: string): Promise<NoteArticleSummary[]>、fetchArticleContent(url: string): Promise<{ title: string; content: string }>）を定義する",
+        "wave": 1,
+        "done": true
+      },
+      {
+        "id": "note-scraper-gateway-impl",
+        "description": "必要に応じて apps/content-reviewer/package.json に RSS/XML パース用パッケージ（fast-xml-parser 等）を追加し pnpm install を実行。src/backend/contexts/knowledge/infrastructure/note-scraper.http-gateway.ts に NoteScraperHttpGateway クラスを実装（NoteScraperGateway interface を implements）。fetchArticleList は https://note.com/{accountName}/rss をフェッチして RSS XML をパースし NoteArticleSummary[] を返す。fetchArticleContent は記事 URL をフェッチして HTML から本文テキストを抽出して返す。src/backend/contexts/knowledge/infrastructure/__tests__/note-scraper.http-gateway.test.ts にユニットテストを追加（fetch をモック）",
+        "wave": 2,
+        "done": true
+      },
+      {
+        "id": "fetch-note-article-list-usecase",
+        "description": "src/backend/contexts/knowledge/application/usecases/fetch-note-article-list.usecase.ts に FetchNoteArticleListUseCase を実装（クラスベース + NoteScraperGateway コンストラクタ DI + execute(accountName: string): Promise<NoteArticleSummary[]>）。src/backend/contexts/knowledge/application/usecases/__tests__/fetch-note-article-list.usecase.test.ts にユニットテストを追加（NoteScraperGateway をモック、正常系・空リスト）",
+        "wave": 2,
+        "done": true
+      },
+      {
+        "id": "import-note-articles-usecase",
+        "description": "src/backend/contexts/knowledge/application/usecases/import-note-articles.usecase.ts に ImportNoteArticlesUseCase を実装（NoteScraperGateway + KnowledgeArticleRepository + KnowledgeEmbeddingRepository + EmbeddingGateway をコンストラクタ DI。execute({ selectedUrls: string[], createdBy: UserId }) で各 URL に対して fetchArticleContent → KnowledgeArticle.create(sourceType: 'note') → articleRepository.save → EmbeddingGateway.generateEmbedding → KnowledgeEmbedding.create → embeddingRepository.saveMany を実行）。src/backend/contexts/knowledge/application/usecases/__tests__/import-note-articles.usecase.test.ts にユニットテストを追加（全依存をモック、正常系: fetchArticleContent・save・generateEmbedding・saveMany の呼び出しを検証）",
+        "wave": 2,
+        "done": true
+      },
+      {
+        "id": "note-import-presentation",
+        "description": "src/backend/contexts/knowledge/presentation/composition/knowledge-article.composition.ts を更新して createFetchNoteArticleListUseCase()（NoteScraperHttpGateway を注入）と createImportNoteArticlesUseCase()（NoteScraperHttpGateway + PrismaKnowledgeArticleRepository + PrismaKnowledgeEmbeddingRepository + OpenAIEmbeddingGateway を注入）ファクトリ関数を追加。src/backend/contexts/knowledge/presentation/loaders/note-article-list.loader.ts を新規作成（loadNoteArticles(accountName: string): Promise<NoteArticleSummary[]>、createFetchNoteArticleListUseCase 経由）。src/backend/contexts/knowledge/presentation/actions/import-note-articles.action.ts を新規作成（'use server' Server Action、FormData から selectedUrls と accountName を受け取り ImportNoteArticlesUseCase を呼び出し revalidatePath('/knowledge') を実行）",
+        "wave": 3,
+        "done": true
+      },
+      {
+        "id": "note-import-ui",
+        "description": "src/components/knowledge/note-article-list.tsx を新規作成（'use client'、NoteArticleSummary[] を props で受け取りチェックボックス付きテーブルを表示し選択記事の URL を import-note-articles.action.ts に送信する form、ローディング状態対応）。src/app/(app)/knowledge/import/page.tsx を更新（Server Component、searchParams.accountName があれば loadNoteArticles() を呼んで NoteArticleList コンポーネントに渡す。アカウント名入力フォームを配置し送信で同ページに ?accountName=xxx リダイレクト）。e2e/knowledge-import.spec.ts を新規作成し /knowledge/import ページの E2E テスト（アカウント名入力フォーム表示・送信後に記事一覧が表示されること・記事選択して保存後に /knowledge ページに遷移し記事が追加されていることを確認する基本シナリオ）を追加",
+        "wave": 4,
+        "done": true
+      },
+      {
+        "id": "verify-milestone5",
+        "description": "pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm exec playwright test を実行し全て成功することを確認。Biome lint エラー・TypeScript 型エラー・ビルドエラー・テスト失敗・E2E テスト失敗があれば全て修正する",
+        "wave": 5,
+        "done": false
+      },
+      {
+        "id": "fix-domain-model-serialization",
+        "description": "E2E テストが 'Only plain objects, and a few built-ins, can be passed to Client Components from Server Components. Classes or null prototypes are not supported.' エラーで失敗する。原因: loadExpressionRules()（expression-rule.loader.ts）と loadKnowledgeArticles()（knowledge-articles.loader.ts）が ExpressionRule / KnowledgeArticle クラスインスタンスをそのまま返しており、page.tsx が Client Component（ExpressionRuleTable, KnowledgeArticleTable）に props として渡す際に Next.js のシリアライズエラーが発生する。修正方針: 各 loader で Domain Model を plain object の DTO に変換して返す。(1) ExpressionRuleProps に相当する plain type（ExpressionRuleDto）を定義し、expression-rule.loader.ts で ExpressionRule インスタンスを { id: rule.id, ngExpression: rule.ngExpression, ... } のスプレッド/明示変換でプレーンオブジェクトに変換して返す。(2) 同様に KnowledgeArticleDto を定義し、knowledge-articles.loader.ts でも変換する。(3) ExpressionRuleTable と KnowledgeArticleTable の props 型を DTO 型に変更し、型整合性を確認する。DTO 型は presentation 層（loaders ディレクトリ内または別の types ファイル）に配置する",
+        "wave": 6,
+        "done": true
+      }
+    ]
   },
   {
     "milestone": 6,
     "goal": "/checks/new でテキストを入力して送信すると、AIGateway による段落分割→5種のチェック（ファクトチェック・ナレッジ整合性・表現ルール適合・炎上リスク・文章クオリティ）が並列実行され、SSE で進捗がリアルタイム表示され、完了後 /checks/[id] で結果詳細（セグメントごとの指摘・severity・修正提案）を確認できる",
     "verification": "pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm exec playwright test",
     "done": false,
-    "tasks": []
+    "tasks": [{
+        "id": "content-check-contracts",
+        "description": "content-check context の全契約定義（W2以降の全タスクが参照する）。(1) src/backend/contexts/shared/domain/models/ に ContentCheckId・ContentSegmentId・CheckResultId の各 branded type（createXxxId ファクトリ + UUID バリデーション）を追加。(2) src/backend/contexts/shared/domain/gateways/ai.gateway.ts を新規作成（AIGateway interface: generate(prompt, options?): Promise<string>、generateWithWebSearch(prompt, options?): Promise<string>、generateStream(prompt, options?): AsyncGenerator<string> + GenerateOptions 型）。(3) src/backend/contexts/content-check/domain/models/content-check.model.ts に ContentCheckProps interface・CheckStatus type ('pending'|'processing'|'completed'|'failed')・Result型・ContentCheck クラス骨格（create/reconstruct/startProcessing/complete/fail のメソッドシグネチャ、ボディは throw new Error('not implemented')）を定義。(4) content-segment.model.ts に ContentSegmentProps + ContentSegment クラス骨格を定義。(5) check-result.model.ts に CheckType type ('fact_check'|'knowledge_consistency'|'expression_rule'|'risk_assessment'|'quality')・Severity type ('info'|'warning'|'error')・CheckResultProps・CheckResult クラス骨格を定義。(6) src/backend/contexts/content-check/domain/gateways/ に ContentCheckFilter 型・ContentCheckRepository（save, findById, findAll(filter)）・ContentSegmentRepository（saveMany, findByContentCheckId）・CheckResultRepository（saveMany, findBySegmentId, findByContentCheckId）・ExpressionRuleProvider（findActiveRules(): Promise<{ngExpression: string; recommendedExpression: string}[]>）・KnowledgeSearchGateway（searchSimilar(embedding: number[], limit: number): Promise<{chunkText: string}[]>）の各 interface ファイルを新規作成する",
+        "wave": 1,
+        "done": true
+      },
+      {
+        "id": "content-check-domain-models",
+        "description": "content-check context のドメインモデル実装とドメインサービス。(1) src/backend/contexts/content-check/domain/models/content-check.model.ts を実装: private constructor + create(source, originalText, userId?) で空文字・30000字上限バリデーション（Result型返却）・reconstruct() で DB復元・startProcessing()/complete()/fail() でステータス遷移を実装。(2) content-segment.model.ts: create(contentCheckId, segmentIndex, text) + reconstruct() を実装。(3) check-result.model.ts: create(segmentId, checkType, severity, message, suggestion?) + reconstruct() を実装。(4) src/backend/contexts/content-check/domain/services/content-review.service.ts を新規作成: ContentReviewService クラス（summarize(results: CheckResult[]): {error: number, warning: number, info: number} で severity 別カウントを集計）。(5) src/backend/contexts/content-check/domain/models/__tests__/ に各モデルのユニットテスト（create 正常系・バリデーションエラー・ステータス遷移）を追加",
+        "wave": 2,
+        "done": true
+      },
+      {
+        "id": "anthropic-ai-gateway",
+        "description": "Anthropic Claude API の AIGateway 実装。apps/content-reviewer/package.json に @anthropic-ai/sdk を追加し pnpm install を実行。src/backend/contexts/shared/infrastructure/ai/anthropic-ai.gateway.ts に AnthropicAIGateway implements AIGateway を実装: generate() は messages.create() で claude-sonnet-4-6 を呼び出し最初の text ブロックを返す、generateWithWebSearch() は web_search_20250305 ツールを tools に渡して messages.create() を呼び出し最終 text ブロックを返す、generateStream() は messages.stream() を使い AsyncGenerator で text_delta チャンクを yield する。ANTHROPIC_API_KEY 環境変数を利用。src/backend/contexts/shared/infrastructure/ai/__tests__/anthropic-ai.gateway.test.ts に @anthropic-ai/sdk をモックしたユニットテスト（generate・generateWithWebSearch の正常系）を追加",
+        "wave": 2,
+        "done": true
+      },
+      {
+        "id": "content-check-repositories",
+        "description": "content-check context の Prisma Repository 実装3種。src/backend/contexts/content-check/infrastructure/repositories/ に以下を新規作成: (1) prisma-content-check.repository.ts: PrismaContentCheckRepository implements ContentCheckRepository（save は upsert、findById、findAll(filter) は ContentCheckFilter に応じた where 条件付き検索 + toDomain/toPrisma 変換）。(2) prisma-content-segment.repository.ts: PrismaContentSegmentRepository implements ContentSegmentRepository（saveMany は createMany、findByContentCheckId + toDomain 変換）。(3) prisma-check-result.repository.ts: PrismaCheckResultRepository implements CheckResultRepository（saveMany は createMany、findBySegmentId、findByContentCheckId + toDomain 変換）。各 Repository は共有 prisma-client.ts の PrismaClient を利用し Prisma 型 ↔ ドメインモデル変換を行う",
+        "wave": 2,
+        "done": true
+      },
+      {
+        "id": "cross-context-providers-impl",
+        "description": "content-check context 内から他 Context のデータを参照するための Gateway 実装2種（Context 間の直接 import を回避）。(1) src/backend/contexts/content-check/infrastructure/prisma-expression-rule.provider.ts: PrismaExpressionRuleProvider implements ExpressionRuleProvider。findActiveRules() で prisma.expressionRule.findMany({ where: { isActive: true } }) を直接呼び出し { ngExpression, recommendedExpression }[] に変換して返す。expression-rule context は一切 import しない。(2) src/backend/contexts/content-check/infrastructure/prisma-knowledge-search.gateway.ts: PrismaKnowledgeSearchGateway implements KnowledgeSearchGateway。searchSimilar(embedding, limit) で pgvector の <-> コサイン距離演算子を使った $queryRaw で knowledge_embeddings テーブルを検索し { chunkText: string }[] を返す。knowledge context は一切 import しない",
+        "wave": 2,
+        "done": true
+      },
+      {
+        "id": "execute-content-check-usecase",
+        "description": "ExecuteContentCheckUseCase の実装（Milestone 6 の中核処理）。src/backend/contexts/content-check/application/usecases/execute-content-check.usecase.ts: コンストラクタ DI（AIGateway, EmbeddingGateway, ContentCheckRepository, ContentSegmentRepository, CheckResultRepository, ExpressionRuleProvider, KnowledgeSearchGateway）。execute({ source, originalText, userId?, onProgress? }): (1) ContentCheck.create → save（status: pending）、(2) AIGateway.generate でセマンティック段落分割プロンプト送信 → JSON パース → ContentSegment 群生成 → saveMany → onProgress('segments_created', {total})、(3) status を processing に更新して save、(4) 各セグメントに対して Promise.all で5種チェックを並列実行（ファクトチェック: generateWithWebSearch / ナレッジ整合性: EmbeddingGateway.generateEmbedding → KnowledgeSearchGateway.searchSimilar → AIGateway.generate / 表現ルール: ExpressionRuleProvider.findActiveRules → AIGateway.generate / 炎上リスク: AIGateway.generate / 文章クオリティ: AIGateway.generate）、各チェック開始・完了時に onProgress('check_started'/'check_completed') を送出、(5) CheckResult[] → saveMany、(6) ContentCheck.complete() → save → onProgress('completed', {contentCheckId, summary})、エラー時は ContentCheck.fail() → save → onProgress('error')。src/backend/contexts/content-check/application/usecases/__tests__/execute-content-check.usecase.test.ts に全依存モックのユニットテスト（正常系: 全 Gateway・Repository の呼び出し検証、エラー系: AIGateway 失敗時の ContentCheck.fail() 確認）を追加",
+        "wave": 3,
+        "done": false
+      },
+      {
+        "id": "get-content-check-detail-usecase",
+        "description": "GetContentCheckDetailUseCase の実装。src/backend/contexts/content-check/application/usecases/ に以下を新規作成: (1) content-check-detail.dto.ts: ContentCheckDetailDto 型（plain object: { id, source, status, originalText, createdAt, segments: { id, segmentIndex, text, results: { id, checkType, severity, message, suggestion | null }[] }[], summary: { error: number, warning: number, info: number } }）を定義。(2) get-content-check-detail.usecase.ts: コンストラクタ DI（ContentCheckRepository, ContentSegmentRepository, CheckResultRepository）。execute(id: string): ContentCheck + 全 segments + 各 segment の results を取得・組み立て → ContentCheckDetailDto を返す（ID 存在しない場合は Error を throw）。(3) __tests__/get-content-check-detail.usecase.test.ts: 全 Repository をモック、正常系（DTO の構造・段落/結果の組み立て検証）・存在しない ID でのエラー確認",
+        "wave": 3,
+        "done": false
+      },
+      {
+        "id": "content-check-composition-and-loader",
+        "description": "content-check context の Composition Root と Loader 実装。(1) src/backend/contexts/content-check/presentation/composition/content-check.composition.ts を新規作成: createExecuteContentCheckUseCase()（AnthropicAIGateway + OpenAIEmbeddingGateway + PrismaContentCheckRepository + PrismaContentSegmentRepository + PrismaCheckResultRepository + PrismaExpressionRuleProvider + PrismaKnowledgeSearchGateway を注入）と createGetContentCheckDetailUseCase()（PrismaContentCheckRepository + PrismaContentSegmentRepository + PrismaCheckResultRepository を注入）のファクトリ関数を定義。(2) src/backend/contexts/content-check/presentation/loaders/get-content-check-detail.loader.ts を新規作成: loadContentCheckDetail(id: string): Promise<ContentCheckDetailDto> を createGetContentCheckDetailUseCase 経由で取得して返す",
+        "wave": 4,
+        "done": false
+      },
+      {
+        "id": "execute-content-check-sse",
+        "description": "SSE ストリーミングエンドポイントの実装。src/app/api/checks/execute/route.ts を新規作成（POST API Route）: リクエストボディから originalText・source を取得、ReadableStream を生成し SSEフォーマット（data: ${JSON.stringify(event)}\\n\\n）で onProgress コールバックのイベント（segments_created, check_started, check_completed, completed, error）を書き出す。createExecuteContentCheckUseCase() を content-check.composition.ts から取得して execute() を呼び出す。開発環境（NODE_ENV=development）ではダミーユーザー ID を使用、本番環境では Supabase Auth セッションから userId を取得。レスポンスは Content-Type: text/event-stream, Cache-Control: no-cache で返す",
+        "wave": 5,
+        "done": false
+      },
+      {
+        "id": "checks-new-page-ui",
+        "description": "/checks/new ページの UI 実装。(1) src/components/checks/check-form.tsx を新規作成（'use client'）: shadcn/ui Textarea でテキスト入力（30000字カウンタ表示）、送信ボタン押下で fetch('/api/checks/execute', { method: 'POST', body: JSON.stringify({ originalText, source: 'web' }) }) を呼び出し ReadableStream reader で SSE イベントを consume、segments_created 受信後に段落数を表示、check_started/check_completed 受信でチェック種別（5種）ごとのステータスバッジ（waiting→running→done）をリアルタイム更新、completed 受信後に router.push(`/checks/${contentCheckId}`) でリダイレクト、error 受信時はエラーメッセージ表示。(2) src/app/(app)/checks/new/page.tsx（Server Component）を更新し CheckForm コンポーネントをレンダリング",
+        "wave": 5,
+        "done": false
+      },
+      {
+        "id": "checks-detail-page-ui",
+        "description": "/checks/[id] 詳細ページの UI 実装。(1) src/components/checks/check-result-summary.tsx を新規作成（Server Component）: error/warning/info の件数をバッジ表示するサマリー統計コンポーネント。(2) src/components/checks/check-result-segment.tsx を新規作成（Server Component）: セグメントテキストと そのセグメントの CheckResult 一覧（checkType ラベル・severity バッジ（error=red, warning=yellow, info=blue）・message・suggestion）を表示。(3) src/app/(app)/checks/[id]/page.tsx を更新（Server Component）: loadContentCheckDetail(params.id) で ContentCheckDetailDto を取得し CheckResultSummary と全 CheckResultSegment コンポーネントを表示（ID 不正時は notFound()）。(4) e2e/checks.spec.ts を新規作成: /checks/new でテキスト入力・送信 → SSE 進捗表示（段落数・チェック種別ステータス）→ 完了後 /checks/[id] へリダイレクト → セグメントごとの結果詳細が表示されることを確認する基本 E2E シナリオを追加",
+        "wave": 5,
+        "done": false
+      },
+      {
+        "id": "verify-milestone6",
+        "description": "pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm exec playwright test を実行し全て成功することを確認。Biome lint エラー・TypeScript 型エラー・ビルドエラー・テスト失敗・E2E テスト失敗があれば全て修正する",
+        "wave": 6,
+        "done": false
+      },
+      {
+        "id": "fix-knowledge-import-error-handling",
+        "description": "E2E テスト knowledge-import.spec.ts が失敗する。根本原因: apps/content-reviewer/src/app/(app)/knowledge/import/page.tsx が loadNoteArticles() を呼び出す際にエラーハンドリングがなく、NoteScraperHttpGateway.fetchArticleList() が HTTP 404 を返すと未処理エラーになりページクラッシュする。修正方針: page.tsx の loadNoteArticles() 呼び出しを try-catch で囲み、エラー時は articles=[] または errorMessage を state にセットして「記事が見つかりませんでした。」または「取得に失敗しました。」を表示する。またはローダー側でエラーをキャッチして空配列を返す。E2E テストが期待している getByRole('table').or(getByText('記事が見つかりませんでした。')) が visible になれば pass する",
+        "wave": 7,
+        "done": false
+      }
+    ]
   },
   {
     "milestone": 7,
