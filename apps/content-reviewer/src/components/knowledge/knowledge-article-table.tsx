@@ -1,6 +1,10 @@
 'use client';
 
+<<<<<<< HEAD
 import type { KnowledgeArticleDto } from '@/backend/contexts/knowledge/presentation/loaders/knowledge-articles.loader';
+=======
+import type { KnowledgeArticleDTO } from '@/backend/contexts/knowledge/presentation/loaders/knowledge-articles.loader';
+>>>>>>> 2e14ad8a790c4eeb080d80eb1d2b97efc83a09ac
 import { Badge } from '@/components/ui/badge';
 import {
 	Table,
@@ -14,7 +18,11 @@ import { DeleteKnowledgeArticleButton } from './delete-knowledge-article-button'
 import { KnowledgeArticleFormDialog } from './knowledge-article-form-dialog';
 
 interface KnowledgeArticleTableProps {
+<<<<<<< HEAD
 	articles: KnowledgeArticleDto[];
+=======
+	articles: KnowledgeArticleDTO[];
+>>>>>>> 2e14ad8a790c4eeb080d80eb1d2b97efc83a09ac
 }
 
 export function KnowledgeArticleTable({ articles }: KnowledgeArticleTableProps) {
@@ -48,7 +56,7 @@ export function KnowledgeArticleTable({ articles }: KnowledgeArticleTableProps) 
 							)}
 						</TableCell>
 						<TableCell className="text-muted-foreground">
-							{article.createdAt.toLocaleDateString('ja-JP')}
+							{new Date(article.createdAt).toLocaleDateString('ja-JP')}
 						</TableCell>
 						<TableCell className="text-right">
 							<div className="flex items-center justify-end gap-2">

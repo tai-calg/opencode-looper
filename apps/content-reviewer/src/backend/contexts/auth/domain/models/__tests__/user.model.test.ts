@@ -135,7 +135,11 @@ describe('User', () => {
 		it('should create a dummy user with default values', () => {
 			const user = User.createDummy();
 
+<<<<<<< HEAD
 			expect(user.id).toBe('00000000-0000-0000-0000-000000000001');
+=======
+			expect(user.id).toBe('00000000-0000-0000-0000-000000000000');
+>>>>>>> 2e14ad8a790c4eeb080d80eb1d2b97efc83a09ac
 			expect(user.email.value).toBe('dummy@example.com');
 			expect(user.name).toBe('Dummy User');
 			expect(user.avatarUrl).toBeNull();
@@ -149,7 +153,11 @@ describe('User', () => {
 				avatarUrl: 'https://example.com/custom.png',
 			});
 
+<<<<<<< HEAD
 			expect(user.id).toBe('00000000-0000-0000-0000-000000000001');
+=======
+			expect(user.id).toBe('00000000-0000-0000-0000-000000000000');
+>>>>>>> 2e14ad8a790c4eeb080d80eb1d2b97efc83a09ac
 			expect(user.name).toBe('Custom Name');
 			expect(user.avatarUrl).toBe('https://example.com/custom.png');
 		});

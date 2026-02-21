@@ -4,7 +4,11 @@ import {
 	createExpressionRuleAction,
 	updateExpressionRuleAction,
 } from '@/backend/contexts/expression-rule/presentation/actions/expression-rule.action';
+<<<<<<< HEAD
 import type { ExpressionRuleDto } from '@/backend/contexts/expression-rule/presentation/loaders/expression-rule.loader';
+=======
+import type { ExpressionRuleDTO } from '@/backend/contexts/expression-rule/presentation/loaders/expression-rule.loader';
+>>>>>>> 2e14ad8a790c4eeb080d80eb1d2b97efc83a09ac
 import { Button } from '@/components/ui/button';
 import {
 	Dialog,
@@ -21,7 +25,11 @@ import { Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
 
 interface ExpressionRuleFormDialogProps {
+<<<<<<< HEAD
 	rule?: ExpressionRuleDto;
+=======
+	rule?: ExpressionRuleDTO;
+>>>>>>> 2e14ad8a790c4eeb080d80eb1d2b97efc83a09ac
 }
 
 export function ExpressionRuleFormDialog({ rule }: ExpressionRuleFormDialogProps) {

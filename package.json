@@ -7,8 +7,13 @@
 		"build": "pnpm -r run build",
 		"test": "pnpm -r run test",
 		"e2e": "pnpm --filter content-reviewer exec playwright test",
+<<<<<<< HEAD
 		"verify": "pnpm lint && pnpm --filter content-reviewer prisma:generate && pnpm typecheck && pnpm build && pnpm test",
 		"verify:full": "pnpm verify && pnpm --filter content-reviewer clean:next && pnpm e2e"
+=======
+		"verify": "pnpm install && pnpm lint && pnpm --filter content-reviewer prisma:generate && pnpm typecheck && pnpm build && pnpm test",
+		"verify:full": "pnpm verify && pnpm e2e"
+>>>>>>> 2e14ad8a790c4eeb080d80eb1d2b97efc83a09ac
 	},
 	"packageManager": "pnpm@9.15.4"
 }

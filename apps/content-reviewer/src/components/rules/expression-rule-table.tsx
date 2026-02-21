@@ -1,6 +1,10 @@
 'use client';
 
+<<<<<<< HEAD
 import type { ExpressionRuleDto } from '@/backend/contexts/expression-rule/presentation/loaders/expression-rule.loader';
+=======
+import type { ExpressionRuleDTO } from '@/backend/contexts/expression-rule/presentation/loaders/expression-rule.loader';
+>>>>>>> 2e14ad8a790c4eeb080d80eb1d2b97efc83a09ac
 import { Badge } from '@/components/ui/badge';
 import {
 	Table,
@@ -14,7 +18,11 @@ import { DeleteExpressionRuleButton } from './delete-expression-rule-button';
 import { ExpressionRuleFormDialog } from './expression-rule-form-dialog';
 
 interface ExpressionRuleTableProps {
+<<<<<<< HEAD
 	rules: ExpressionRuleDto[];
+=======
+	rules: ExpressionRuleDTO[];
+>>>>>>> 2e14ad8a790c4eeb080d80eb1d2b97efc83a09ac
 }
 
 export function ExpressionRuleTable({ rules }: ExpressionRuleTableProps) {
@@ -30,10 +38,30 @@ export function ExpressionRuleTable({ rules }: ExpressionRuleTableProps) {
 				</TableRow>
 			</TableHeader>
 			<TableBody>
+<<<<<<< HEAD
 				{rules.length === 0 ? (
 					<TableRow>
 						<TableCell colSpan={5} className="text-muted-foreground text-sm py-8 text-center">
 							表現ルールが登録されていません。
+=======
+				{rules.map((rule) => (
+					<TableRow key={rule.id}>
+						<TableCell className="font-medium">{rule.ngExpression}</TableCell>
+						<TableCell>{rule.recommendedExpression}</TableCell>
+						<TableCell className="text-muted-foreground">{rule.description ?? '—'}</TableCell>
+						<TableCell>
+							{rule.isActive ? (
+								<Badge variant="default">有効</Badge>
+							) : (
+								<Badge variant="secondary">無効</Badge>
+							)}
+						</TableCell>
+						<TableCell className="text-right">
+							<div className="flex items-center justify-end gap-2">
+								<ExpressionRuleFormDialog rule={rule} />
+								<DeleteExpressionRuleButton ruleId={rule.id} ngExpression={rule.ngExpression} />
+							</div>
+>>>>>>> 2e14ad8a790c4eeb080d80eb1d2b97efc83a09ac
 						</TableCell>
 					</TableRow>
 				) : (
