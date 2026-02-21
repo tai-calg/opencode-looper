@@ -354,7 +354,7 @@
         "id": "content-check-composition-and-loader",
         "description": "content-check context の Composition Root と Loader 実装。(1) src/backend/contexts/content-check/presentation/composition/content-check.composition.ts を新規作成: createExecuteContentCheckUseCase()（AnthropicAIGateway + OpenAIEmbeddingGateway + PrismaContentCheckRepository + PrismaContentSegmentRepository + PrismaCheckResultRepository + PrismaExpressionRuleProvider + PrismaKnowledgeSearchGateway を注入）と createGetContentCheckDetailUseCase()（PrismaContentCheckRepository + PrismaContentSegmentRepository + PrismaCheckResultRepository を注入）のファクトリ関数を定義。(2) src/backend/contexts/content-check/presentation/loaders/get-content-check-detail.loader.ts を新規作成: loadContentCheckDetail(id: string): Promise<ContentCheckDetailDto> を createGetContentCheckDetailUseCase 経由で取得して返す",
         "wave": 4,
-        "done": false
+        "done": true
       },
       {
         "id": "execute-content-check-sse",
