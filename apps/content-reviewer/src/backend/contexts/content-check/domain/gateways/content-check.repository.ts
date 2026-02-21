@@ -5,6 +5,9 @@ import type { CheckStatus, ContentCheck } from '../models/content-check.model';
 export interface ContentCheckFilter {
 	userId?: UserId;
 	status?: CheckStatus;
+	source?: 'web' | 'slack';
+	createdAfter?: Date;
+	createdBefore?: Date;
 }
 
 export interface ContentCheckRepository {
