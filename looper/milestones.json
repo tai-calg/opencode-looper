@@ -1,11 +1,9 @@
-[
-  {
+[{
     "milestone": 1,
     "goal": "pnpm workspace + Next.js App Router プロジェクトが起動し、Biome lint / typecheck / build が通り、shadcn/ui + Tailwind CSS でレイアウト（サイドバー + ヘッダー）が表示され、Prisma スキーマに全テーブルが定義されて prisma generate が成功する",
     "verification": "pnpm lint && pnpm typecheck && pnpm build",
     "done": true,
-    "tasks": [
-      {
+    "tasks": [{
         "id": "project-scaffold",
         "description": "pnpm workspace + Next.js App Router プロジェクトの初期構築。ルート package.json（workspace scripts: lint, typecheck, build）、pnpm-workspace.yaml、apps/content-reviewer/ 配下に package.json・next.config.ts・tsconfig.json・tailwind.config.ts・postcss.config.mjs・biome.json を作成し、Tailwind CSS v4 + PostCSS を設定、apps/content-reviewer/src/app/globals.css に Tailwind ディレクティブを記述、最小限の app/layout.tsx と app/page.tsx で pnpm build が通る状態にする",
         "wave": 1,
@@ -42,8 +40,7 @@
     "goal": "Supabase Auth による Google OAuth ログイン・ログアウトが動作し、未認証時は /login にリダイレクトされ、開発環境（NODE_ENV=development）では認証スキップでダミーユーザーとしてダッシュボード（空の / ページ）にアクセスできる",
     "verification": "pnpm lint && pnpm typecheck && pnpm build && pnpm test",
     "done": true,
-    "tasks": [
-      {
+    "tasks": [{
         "id": "auth-deps-and-test-setup",
         "description": "apps/content-reviewer/package.json に @supabase/supabase-js, @supabase/ssr, vitest を追加し pnpm install を実行。apps/content-reviewer/vitest.config.ts を作成（src/ 配下のテストを対象、パスエイリアス @/ を設定）。apps/content-reviewer/package.json に test script（vitest run）を追加。ルート package.json に test script（pnpm -r run test）を追加",
         "wave": 1,
@@ -104,8 +101,7 @@
     "goal": "/rules ページで表現ルール（NG表現→推奨表現）の一覧表示・新規登録・編集・削除ができ、ExpressionRule ドメインモデル → PrismaExpressionRuleRepository → UseCase（CRUD 4種） → Server Actions → UI の全レイヤーが縦に通って DB に永続化される",
     "verification": "pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm exec playwright test",
     "done": true,
-    "tasks": [
-      {
+    "tasks": [{
         "id": "expression-rule-contracts",
         "description": "expression-rule context の契約定義。src/backend/contexts/shared/domain/models/expression-rule-id.model.ts に ExpressionRuleId branded type（createExpressionRuleId ファクトリ + UUID バリデーション）を作成。src/backend/contexts/expression-rule/domain/models/expression-rule.model.ts に ExpressionRule クラスの型定義（ExpressionRuleProps interface: id, ngExpression, recommendedExpression, description, isActive, createdBy, createdAt, updatedAt）と Result 型を定義。src/backend/contexts/expression-rule/domain/gateways/expression-rule.repository.ts に ExpressionRuleRepository interface（save, findById, findAll, findActive, delete）をドメインモデル型のみで定義",
         "wave": 1,
@@ -166,8 +162,7 @@
     "goal": "/knowledge ページでナレッジ記事の一覧表示・手動登録・編集ができ、保存時に OpenAI Embeddings API で Embedding が自動生成されて pgvector に格納され、KnowledgeArticle / KnowledgeEmbedding ドメインモデル → Repository → UseCase → UI が動作する",
     "verification": "pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm exec playwright test",
     "done": true,
-    "tasks": [
-      {
+    "tasks": [{
         "id": "knowledge-contracts",
         "description": "knowledge context の契約定義。src/backend/contexts/shared/domain/models/knowledge-article-id.model.ts（KnowledgeArticleId branded type + UUID バリデーション）、knowledge-embedding-id.model.ts（KnowledgeEmbeddingId branded type）を作成。src/backend/contexts/shared/domain/gateways/embedding.gateway.ts に EmbeddingGateway interface（generateEmbedding(text: string): Promise<number[]>）を定義。src/backend/contexts/knowledge/domain/models/knowledge-article.model.ts に KnowledgeArticleProps interface と Result 型の型定義のみを記述。src/backend/contexts/knowledge/domain/models/knowledge-embedding.model.ts に KnowledgeEmbeddingProps interface と型定義のみを記述。src/backend/contexts/knowledge/domain/gateways/knowledge-article.repository.ts に KnowledgeArticleRepository interface（save, findById, findAll, delete）を定義。src/backend/contexts/knowledge/domain/gateways/knowledge-embedding.repository.ts に KnowledgeEmbeddingRepository interface（saveMany, deleteByArticleId, searchSimilar）を定義",
         "wave": 1,
@@ -240,8 +235,7 @@
     "goal": "/knowledge/import で note アカウント名を入力すると NoteScraperGateway 経由で記事一覧が表示され、選択した記事の本文を取得して DB に保存し Embedding を生成できる",
     "verification": "pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm exec playwright test",
     "done": true,
-    "tasks": [
-      {
+    "tasks": [{
         "id": "note-scraper-contract",
         "description": "src/backend/contexts/knowledge/domain/gateways/note-scraper.gateway.ts を新規作成し、NoteArticleSummary 型（title: string, url: string, publishedAt: Date）と NoteScraperGateway interface（fetchArticleList(accountName: string): Promise<NoteArticleSummary[]>、fetchArticleContent(url: string): Promise<{ title: string; content: string }>）を定義する",
         "wave": 1,
@@ -289,9 +283,8 @@
     "milestone": 6,
     "goal": "/checks/new でテキストを入力して送信すると、AIGateway による段落分割→5種のチェック（ファクトチェック・ナレッジ整合性・表現ルール適合・炎上リスク・文章クオリティ）が並列実行され、SSE で進捗がリアルタイム表示され、完了後 /checks/[id] で結果詳細（セグメントごとの指摘・severity・修正提案）を確認できる",
     "verification": "pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm exec playwright test",
-    "done": false,
-    "tasks": [
-      {
+    "done": true,
+    "tasks": [{
         "id": "content-check-contracts",
         "description": "content-check context の全契約定義（W2以降の全タスクが参照する）。(1) src/backend/contexts/shared/domain/models/ に ContentCheckId・ContentSegmentId・CheckResultId の各 branded type（createXxxId ファクトリ + UUID バリデーション）を追加。(2) src/backend/contexts/shared/domain/gateways/ai.gateway.ts を新規作成（AIGateway interface: generate(prompt, options?): Promise<string>、generateWithWebSearch(prompt, options?): Promise<string>、generateStream(prompt, options?): AsyncGenerator<string> + GenerateOptions 型）。(3) src/backend/contexts/content-check/domain/models/content-check.model.ts に ContentCheckProps interface・CheckStatus type ('pending'|'processing'|'completed'|'failed')・Result型・ContentCheck クラス骨格（create/reconstruct/startProcessing/complete/fail のメソッドシグネチャ、ボディは throw new Error('not implemented')）を定義。(4) content-segment.model.ts に ContentSegmentProps + ContentSegment クラス骨格を定義。(5) check-result.model.ts に CheckType type ('fact_check'|'knowledge_consistency'|'expression_rule'|'risk_assessment'|'quality')・Severity type ('info'|'warning'|'error')・CheckResultProps・CheckResult クラス骨格を定義。(6) src/backend/contexts/content-check/domain/gateways/ に ContentCheckFilter 型・ContentCheckRepository（save, findById, findAll(filter)）・ContentSegmentRepository（saveMany, findByContentCheckId）・CheckResultRepository（saveMany, findBySegmentId, findByContentCheckId）・ExpressionRuleProvider（findActiveRules(): Promise<{ngExpression: string; recommendedExpression: string}[]>）・KnowledgeSearchGateway（searchSimilar(embedding: number[], limit: number): Promise<{chunkText: string}[]>）の各 interface ファイルを新規作成する",
         "wave": 1,
@@ -368,12 +361,6 @@
         "description": "E2E テスト checks.spec.ts のフローテストが失敗する。根本原因: apps/content-reviewer/src/app/api/checks/execute/route.ts が NODE_ENV=development 時にダミーユーザー ID (00000000-0000-0000-0000-000000000000) を ContentCheck に設定して save しようとするが、users テーブルにそのユーザーが存在しないため prisma.contentCheck.upsert() が外部キー制約違反 (content_checks_user_id_fkey) で失敗する。修正方針: ContentCheck.userId は nullable (userId?: UserId) であるため、NODE_ENV=development 時は userId を undefined のまま execute() に渡し、DB に null で保存されるようにする。route.ts から createUserId(DUMMY_USER_ID) の呼び出しを開発環境では行わず、userId を undefined にする。",
         "wave": 6,
         "done": true
-      },
-      {
-        "id": "fix-execute-content-check-usecase-dummy-user",
-        "description": "E2E テスト checks.spec.ts フローテストが FK 制約違反で失敗し続ける。根本原因: route.ts の修正（userId=undefined を渡す）は完了しているが、execute-content-check.usecase.ts の execute() 内 line 68 に `const effectiveUserId = userId ?? createUserId('00000000-0000-0000-0000-000000000000');` というフォールバックが残っており、userId が undefined のとき users テーブルに存在しないダミー UUID を ContentCheck に設定して DB に保存しようとするため FK 制約違反が発生する。修正方針: (1) ContentCheck.create() の props から userId を optional（userId?: UserId）に変更し、ContentCheckProps も同様に更新する。(2) execute-content-check.usecase.ts の effectiveUserId フォールバックを削除し、userId を undefined のまま ContentCheck.create() に渡す。(3) PrismaContentCheckRepository.toPrisma() で userId が undefined の場合に null を返すよう修正（userId: contentCheck.userId as string → userId: contentCheck.userId ? contentCheck.userId as string : null）。(4) PrismaContentCheckRepository.toDomain() で userId が null の場合に throw しないよう修正（userId が null なら undefined を渡す）。これにより開発環境では userId=null で ContentCheck が DB に保存され FK 制約違反が解消される。",
-        "wave": 7,
-        "done": false
       }
     ]
   },
