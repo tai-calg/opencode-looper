@@ -54,13 +54,9 @@ export class PrismaContentCheckRepository implements ContentCheckRepository {
 	}
 
 	private toDomain(record: PrismaContentCheck): ContentCheck {
-		if (!record.userId) {
-			throw new Error(`ContentCheck ${record.id} has no userId`);
-		}
-
 		return ContentCheck.reconstruct({
 			id: createContentCheckId(record.id),
-			userId: createUserId(record.userId),
+			userId: record.userId ? createUserId(record.userId) : undefined,
 			content: record.originalText,
 			status: record.status as CheckStatus,
 			failedReason: null,
@@ -71,7 +67,7 @@ export class PrismaContentCheckRepository implements ContentCheckRepository {
 
 	private toPrisma(contentCheck: ContentCheck): {
 		id: string;
-		userId: string;
+		userId: string | null;
 		source: 'web';
 		originalText: string;
 		status: Status;
@@ -82,7 +78,7 @@ export class PrismaContentCheckRepository implements ContentCheckRepository {
 	} {
 		return {
 			id: contentCheck.id as string,
-			userId: contentCheck.userId as string,
+			userId: (contentCheck.userId as string | undefined) ?? null,
 			source: 'web',
 			originalText: contentCheck.content,
 			status: contentCheck.status as Status,

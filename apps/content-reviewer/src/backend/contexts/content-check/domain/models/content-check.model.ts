@@ -7,7 +7,7 @@ export type Result<T, E> = { success: true; value: T } | { success: false; error
 
 export interface ContentCheckProps {
 	readonly id: ContentCheckId;
-	readonly userId: UserId;
+	readonly userId: UserId | undefined;
 	readonly content: string;
 	readonly status: CheckStatus;
 	readonly failedReason: string | null;
@@ -19,7 +19,7 @@ const MAX_CONTENT_LENGTH = 30000;
 
 export class ContentCheck {
 	readonly id: ContentCheckId;
-	readonly userId: UserId;
+	readonly userId: UserId | undefined;
 	readonly content: string;
 	readonly status: CheckStatus;
 	readonly failedReason: string | null;
@@ -38,7 +38,7 @@ export class ContentCheck {
 
 	static create(props: {
 		id: ContentCheckId;
-		userId: UserId;
+		userId?: UserId;
 		content: string;
 	}): Result<ContentCheck, string> {
 		if (!props.content || props.content.trim().length === 0) {
@@ -57,7 +57,7 @@ export class ContentCheck {
 			success: true,
 			value: new ContentCheck({
 				id: props.id,
-				userId: props.userId,
+				userId: props.userId ?? undefined,
 				content: props.content,
 				status: 'pending',
 				failedReason: null,

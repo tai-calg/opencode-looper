@@ -5,7 +5,6 @@ import { createCheckResultId } from '@/backend/contexts/shared/domain/models/che
 import { createContentCheckId } from '@/backend/contexts/shared/domain/models/content-check-id.model';
 import { createContentSegmentId } from '@/backend/contexts/shared/domain/models/content-segment-id.model';
 import type { UserId } from '@/backend/contexts/shared/domain/models/user-id.model';
-import { createUserId } from '@/backend/contexts/shared/domain/models/user-id.model';
 import type { CheckResultRepository } from '../../domain/gateways/check-result.repository';
 import type { ContentCheckRepository } from '../../domain/gateways/content-check.repository';
 import type { ContentSegmentRepository } from '../../domain/gateways/content-segment.repository';
@@ -65,13 +64,12 @@ export class ExecuteContentCheckUseCase {
 	async execute(input: ExecuteContentCheckInput): Promise<ExecuteContentCheckOutput> {
 		const { source, originalText, userId, onProgress } = input;
 
-		const effectiveUserId = userId ?? createUserId('00000000-0000-0000-0000-000000000000');
 		const contentCheckId = createContentCheckId(crypto.randomUUID());
 
 		// (1) ContentCheck.create → save (status: pending)
 		const createResult = ContentCheck.create({
 			id: contentCheckId,
-			userId: effectiveUserId,
+			userId,
 			content: originalText,
 		});
 		if (!createResult.success) {

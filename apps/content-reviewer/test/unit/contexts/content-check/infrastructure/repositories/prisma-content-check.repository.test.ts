@@ -139,14 +139,22 @@ describe('PrismaContentCheckRepository', () => {
 			expect(result).toBe(mockContentCheck);
 		});
 
-		it('should throw when record has no userId', async () => {
+		it('should return domain model with undefined userId when record has no userId', async () => {
 			const record = makePrismaRecord({ userId: null });
+			const mockContentCheck = makeDomainContentCheck();
+			vi.spyOn(ContentCheck, 'reconstruct').mockReturnValue(mockContentCheck);
+
 			const prisma = createMockPrisma({
 				findUnique: vi.fn().mockResolvedValue(record),
 			});
 			const repo = new PrismaContentCheckRepository(prisma);
 
-			await expect(repo.findById(validId)).rejects.toThrow('has no userId');
+			const result = await repo.findById(validId);
+
+			expect(ContentCheck.reconstruct).toHaveBeenCalledWith(
+				expect.objectContaining({ userId: undefined }),
+			);
+			expect(result).toBe(mockContentCheck);
 		});
 	});
 
