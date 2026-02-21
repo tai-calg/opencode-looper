@@ -41,6 +41,8 @@ function makeDomainContentCheck(status: CheckStatus = 'pending'): ContentCheck {
 		content: 'テストコンテンツ',
 		status,
 		failedReason: null,
+		slackChannelId: null,
+		slackThreadTs: null,
 		createdAt: now,
 		updatedAt: now,
 	}) as ContentCheck;
@@ -136,6 +138,8 @@ describe('PrismaContentCheckRepository', () => {
 				content: 'テストコンテンツ',
 				status: 'pending',
 				failedReason: null,
+				slackChannelId: null,
+				slackThreadTs: null,
 				createdAt: now,
 				updatedAt: now,
 			});

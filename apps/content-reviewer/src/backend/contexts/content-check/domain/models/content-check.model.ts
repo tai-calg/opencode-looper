@@ -14,6 +14,8 @@ export interface ContentCheckProps {
 	readonly content: string;
 	readonly status: CheckStatus;
 	readonly failedReason: string | null;
+	readonly slackChannelId: string | null;
+	readonly slackThreadTs: string | null;
 	readonly createdAt: Date;
 	readonly updatedAt: Date;
 }
@@ -27,6 +29,8 @@ export class ContentCheck {
 	readonly content: string;
 	readonly status: CheckStatus;
 	readonly failedReason: string | null;
+	readonly slackChannelId: string | null;
+	readonly slackThreadTs: string | null;
 	readonly createdAt: Date;
 	readonly updatedAt: Date;
 
@@ -37,6 +41,8 @@ export class ContentCheck {
 		this.content = props.content;
 		this.status = props.status;
 		this.failedReason = props.failedReason;
+		this.slackChannelId = props.slackChannelId;
+		this.slackThreadTs = props.slackThreadTs;
 		this.createdAt = props.createdAt;
 		this.updatedAt = props.updatedAt;
 	}
@@ -46,6 +52,8 @@ export class ContentCheck {
 		userId?: UserId;
 		source?: CheckSource;
 		content: string;
+		slackChannelId?: string | null;
+		slackThreadTs?: string | null;
 	}): Result<ContentCheck, string> {
 		if (!props.content || props.content.trim().length === 0) {
 			return { success: false, error: 'Content cannot be empty' };
@@ -68,6 +76,8 @@ export class ContentCheck {
 				content: props.content,
 				status: 'pending',
 				failedReason: null,
+				slackChannelId: props.slackChannelId ?? null,
+				slackThreadTs: props.slackThreadTs ?? null,
 				createdAt: now,
 				updatedAt: now,
 			}),
@@ -141,6 +151,8 @@ export class ContentCheck {
 			content: this.content,
 			status: this.status,
 			failedReason: this.failedReason,
+			slackChannelId: this.slackChannelId,
+			slackThreadTs: this.slackThreadTs,
 			createdAt: this.createdAt,
 			updatedAt: this.updatedAt,
 		};

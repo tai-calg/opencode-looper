@@ -76,6 +76,8 @@ export class PrismaContentCheckRepository implements ContentCheckRepository {
 			content: record.originalText,
 			status: record.status as CheckStatus,
 			failedReason: null,
+			slackChannelId: record.slackChannelId,
+			slackThreadTs: record.slackThreadTs,
 			createdAt: record.createdAt,
 			updatedAt: record.updatedAt,
 		});
@@ -98,8 +100,8 @@ export class PrismaContentCheckRepository implements ContentCheckRepository {
 			source: contentCheck.source as Source,
 			originalText: contentCheck.content,
 			status: contentCheck.status as Status,
-			slackChannelId: null,
-			slackThreadTs: null,
+			slackChannelId: contentCheck.slackChannelId,
+			slackThreadTs: contentCheck.slackThreadTs,
 			createdAt: contentCheck.createdAt,
 			updatedAt: contentCheck.updatedAt,
 		};

@@ -87,6 +87,8 @@ describe('ContentCheck', () => {
 				content: 'test content',
 				status: 'pending',
 				failedReason: null,
+				slackChannelId: null,
+				slackThreadTs: null,
 				createdAt: now,
 				updatedAt: now,
 			});
@@ -109,6 +111,8 @@ describe('ContentCheck', () => {
 				content: 'test content',
 				status: 'completed',
 				failedReason: null,
+				slackChannelId: null,
+				slackThreadTs: null,
 				createdAt: now,
 				updatedAt: now,
 			});
@@ -146,6 +150,8 @@ describe('ContentCheck', () => {
 				content: 'test',
 				status: 'processing',
 				failedReason: null,
+				slackChannelId: null,
+				slackThreadTs: null,
 				createdAt: now,
 				updatedAt: now,
 			});
@@ -167,6 +173,8 @@ describe('ContentCheck', () => {
 				content: 'test',
 				status: 'completed',
 				failedReason: null,
+				slackChannelId: null,
+				slackThreadTs: null,
 				createdAt: now,
 				updatedAt: now,
 			});
@@ -187,6 +195,8 @@ describe('ContentCheck', () => {
 				content: 'test',
 				status: 'processing',
 				failedReason: null,
+				slackChannelId: null,
+				slackThreadTs: null,
 				createdAt: now,
 				updatedAt: now,
 			});
@@ -222,6 +232,8 @@ describe('ContentCheck', () => {
 				content: 'test',
 				status: 'completed',
 				failedReason: null,
+				slackChannelId: null,
+				slackThreadTs: null,
 				createdAt: now,
 				updatedAt: now,
 			});
@@ -260,6 +272,8 @@ describe('ContentCheck', () => {
 				content: 'test',
 				status: 'processing',
 				failedReason: null,
+				slackChannelId: null,
+				slackThreadTs: null,
 				createdAt: now,
 				updatedAt: now,
 			});
@@ -300,6 +314,8 @@ describe('ContentCheck', () => {
 				content: 'test',
 				status: 'completed',
 				failedReason: null,
+				slackChannelId: null,
+				slackThreadTs: null,
 				createdAt: now,
 				updatedAt: now,
 			});
@@ -318,6 +334,8 @@ describe('ContentCheck', () => {
 				content: 'test',
 				status: 'failed',
 				failedReason: 'previous error',
+				slackChannelId: null,
+				slackThreadTs: null,
 				createdAt: now,
 				updatedAt: now,
 			});
