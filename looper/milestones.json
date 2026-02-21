@@ -368,7 +368,7 @@
     "milestone": 7,
     "goal": "ダッシュボード（/）に過去のチェック履歴一覧が表示され、ソース種別（Web / Slack）・ステータス・実行日時でフィルタリングでき、各行クリックで /checks/[id] の詳細ページに遷移できる",
     "verification": "pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm exec playwright test",
-    "done": false,
+    "done": true,
     "tasks": [
       {
         "id": "dashboard-contracts",
@@ -446,7 +446,7 @@
         "id": "fix-filter-select-dropdown-not-opening",
         "description": "E2E テスト dashboard.spec.ts の2件（ソース種別フィルタ変更・全てに戻すテスト）がまだ失敗する。根本原因: force: true でクリックしても shadcn/ui（Radix UI）の SelectTrigger の内部 open 状態が切り替わらず、SelectContent（ドロップダウン）が表示されない。Radix UI の Select は JavaScript のポインタイベントに依存しており、force: true はオーバーラップチェックをスキップするだけで Radix UI の open 状態を変更しない。修正方針: e2e/dashboard.spec.ts の2件のフィルタテストを、UI操作でドロップダウンを開く代わりに URL を直接変更してフィルタが反映されることを検証するテストに変更する。具体的には: (1)「ソース種別フィルタを変更すると URL に source パラメータが追加される」テスト: page.goto('/?source=web') で直接遷移し、URL に source=web が含まれることを確認。または page.evaluate() で CheckHistoryFilter の router.push を直接呼び出す。(2)「フィルタを「全て」に戻すと URL パラメータが削除される」テスト: page.goto('/') で直接遷移し URL に source が含まれないことを確認。なお、フィルタ UI のインタラクション（クリックでドロップダウンが開く）を実際に検証したい場合は、Playwright の page.dispatchEvent() で 'click' イベントを直接ディスパッチするか、または Storybook / コンポーネントテストに移譲する。最終的に dashboard.spec.ts の全テストが pass すること。",
         "wave": 6,
-        "done": false
+        "done": true
       }
     ]
   },
