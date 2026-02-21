@@ -342,13 +342,13 @@
         "id": "execute-content-check-usecase",
         "description": "ExecuteContentCheckUseCase の実装（Milestone 6 の中核処理）。src/backend/contexts/content-check/application/usecases/execute-content-check.usecase.ts: コンストラクタ DI（AIGateway, EmbeddingGateway, ContentCheckRepository, ContentSegmentRepository, CheckResultRepository, ExpressionRuleProvider, KnowledgeSearchGateway）。execute({ source, originalText, userId?, onProgress? }): (1) ContentCheck.create → save（status: pending）、(2) AIGateway.generate でセマンティック段落分割プロンプト送信 → JSON パース → ContentSegment 群生成 → saveMany → onProgress('segments_created', {total})、(3) status を processing に更新して save、(4) 各セグメントに対して Promise.all で5種チェックを並列実行（ファクトチェック: generateWithWebSearch / ナレッジ整合性: EmbeddingGateway.generateEmbedding → KnowledgeSearchGateway.searchSimilar → AIGateway.generate / 表現ルール: ExpressionRuleProvider.findActiveRules → AIGateway.generate / 炎上リスク: AIGateway.generate / 文章クオリティ: AIGateway.generate）、各チェック開始・完了時に onProgress('check_started'/'check_completed') を送出、(5) CheckResult[] → saveMany、(6) ContentCheck.complete() → save → onProgress('completed', {contentCheckId, summary})、エラー時は ContentCheck.fail() → save → onProgress('error')。src/backend/contexts/content-check/application/usecases/__tests__/execute-content-check.usecase.test.ts に全依存モックのユニットテスト（正常系: 全 Gateway・Repository の呼び出し検証、エラー系: AIGateway 失敗時の ContentCheck.fail() 確認）を追加",
         "wave": 3,
-        "done": false
+        "done": true
       },
       {
         "id": "get-content-check-detail-usecase",
         "description": "GetContentCheckDetailUseCase の実装。src/backend/contexts/content-check/application/usecases/ に以下を新規作成: (1) content-check-detail.dto.ts: ContentCheckDetailDto 型（plain object: { id, source, status, originalText, createdAt, segments: { id, segmentIndex, text, results: { id, checkType, severity, message, suggestion | null }[] }[], summary: { error: number, warning: number, info: number } }）を定義。(2) get-content-check-detail.usecase.ts: コンストラクタ DI（ContentCheckRepository, ContentSegmentRepository, CheckResultRepository）。execute(id: string): ContentCheck + 全 segments + 各 segment の results を取得・組み立て → ContentCheckDetailDto を返す（ID 存在しない場合は Error を throw）。(3) __tests__/get-content-check-detail.usecase.test.ts: 全 Repository をモック、正常系（DTO の構造・段落/結果の組み立て検証）・存在しない ID でのエラー確認",
         "wave": 3,
-        "done": false
+        "done": true
       },
       {
         "id": "content-check-composition-and-loader",
