@@ -3,5 +3,9 @@ import { createFetchNoteArticleListUseCase } from '@/backend/contexts/knowledge/
 
 export async function loadNoteArticles(accountName: string): Promise<NoteArticleSummary[]> {
 	const useCase = createFetchNoteArticleListUseCase();
-	return useCase.execute(accountName);
+	try {
+		return await useCase.execute(accountName);
+	} catch {
+		return [];
+	}
 }
