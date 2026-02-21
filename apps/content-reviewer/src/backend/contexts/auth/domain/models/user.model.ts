@@ -103,11 +103,7 @@ export class User {
 		}> = {},
 	): User {
 		const result = User.create({
-<<<<<<< HEAD
 			id: overrides.id ?? '00000000-0000-0000-0000-000000000001',
-=======
-			id: overrides.id ?? '00000000-0000-0000-0000-000000000000',
->>>>>>> 2e14ad8a790c4eeb080d80eb1d2b97efc83a09ac
 			email: overrides.email ?? 'dummy@example.com',
 			name: overrides.name ?? 'Dummy User',
 			avatarUrl: overrides.avatarUrl !== undefined ? overrides.avatarUrl : null,

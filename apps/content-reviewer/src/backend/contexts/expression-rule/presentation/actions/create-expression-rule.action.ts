@@ -4,11 +4,7 @@ import { createCreateExpressionRuleUseCase } from '@/backend/contexts/expression
 import { createUserId } from '@/backend/contexts/shared/domain/models/user-id.model';
 import { revalidatePath } from 'next/cache';
 
-<<<<<<< HEAD
 const DUMMY_USER_ID = '00000000-0000-0000-0000-000000000001';
-=======
-const DUMMY_USER_ID = '00000000-0000-0000-0000-000000000000';
->>>>>>> 2e14ad8a790c4eeb080d80eb1d2b97efc83a09ac
 
 export async function createExpressionRuleAction(formData: FormData): Promise<void> {
 	const ngExpression = formData.get('ngExpression');
