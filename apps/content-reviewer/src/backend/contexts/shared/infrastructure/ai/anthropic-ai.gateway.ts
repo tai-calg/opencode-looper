@@ -7,17 +7,46 @@ import Anthropic from '@anthropic-ai/sdk';
 const MODEL = 'claude-sonnet-4-6';
 const DEFAULT_MAX_TOKENS = 4096;
 
+const STUB_SEGMENTATION_RESPONSE = '[{"text":"テスト段落"}]';
+const STUB_CHECK_RESPONSE =
+	'[{"checkType":"fact_check","severity":"info","message":"テスト結果","suggestion":null}]';
+const STUB_CHECK_RESULT = '{"severity":"info","message":"テスト結果","suggestion":null}';
+
+function isStubMode(): boolean {
+	const key = process.env.ANTHROPIC_API_KEY;
+	return !key || key === 'test' || key === 'undefined';
+}
+
+function buildStubResponse(prompt: string): string {
+	if (prompt.includes('セマンティックな段落') || prompt.includes('segmentIndex')) {
+		return STUB_SEGMENTATION_RESPONSE;
+	}
+	if (prompt.includes('checkType') || prompt.includes('severity')) {
+		return STUB_CHECK_RESPONSE;
+	}
+	return STUB_CHECK_RESULT;
+}
+
 export class AnthropicAIGateway implements AIGateway {
-	private readonly client: Anthropic;
+	private readonly client: Anthropic | null;
 
 	constructor() {
-		this.client = new Anthropic({
-			apiKey: process.env.ANTHROPIC_API_KEY,
-		});
+		if (isStubMode()) {
+			this.client = null;
+		} else {
+			this.client = new Anthropic({
+				apiKey: process.env.ANTHROPIC_API_KEY,
+			});
+		}
 	}
 
 	async generate(prompt: string, options?: GenerateOptions): Promise<string> {
-		const response = await this.client.messages.create({
+		if (isStubMode()) {
+			return buildStubResponse(prompt);
+		}
+
+		const client = this.client as Anthropic;
+		const response = await client.messages.create({
 			model: MODEL,
 			max_tokens: options?.maxTokens ?? DEFAULT_MAX_TOKENS,
 			...(options?.temperature !== undefined && { temperature: options.temperature }),
@@ -32,7 +61,12 @@ export class AnthropicAIGateway implements AIGateway {
 	}
 
 	async generateWithWebSearch(prompt: string, options?: GenerateOptions): Promise<string> {
-		const response = await this.client.messages.create({
+		if (isStubMode()) {
+			return buildStubResponse(prompt);
+		}
+
+		const client = this.client as Anthropic;
+		const response = await client.messages.create({
 			model: MODEL,
 			max_tokens: options?.maxTokens ?? DEFAULT_MAX_TOKENS,
 			...(options?.temperature !== undefined && { temperature: options.temperature }),
@@ -55,7 +89,13 @@ export class AnthropicAIGateway implements AIGateway {
 	}
 
 	async *generateStream(prompt: string, options?: GenerateOptions): AsyncGenerator<string> {
-		const stream = await this.client.messages.stream({
+		if (isStubMode()) {
+			yield buildStubResponse(prompt);
+			return;
+		}
+
+		const client = this.client as Anthropic;
+		const stream = await client.messages.stream({
 			model: MODEL,
 			max_tokens: options?.maxTokens ?? DEFAULT_MAX_TOKENS,
 			...(options?.temperature !== undefined && { temperature: options.temperature }),

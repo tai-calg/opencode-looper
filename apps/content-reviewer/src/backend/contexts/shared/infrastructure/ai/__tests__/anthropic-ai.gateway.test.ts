@@ -9,6 +9,8 @@ describe('AnthropicAIGateway', () => {
 	const mockStream = vi.fn();
 
 	beforeEach(() => {
+		// ANTHROPIC_API_KEY を設定してスタブモードを無効化する
+		process.env.ANTHROPIC_API_KEY = 'test-key';
 		vi.mocked(Anthropic).mockImplementation(
 			() =>
 				({
