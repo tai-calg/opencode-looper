@@ -3,13 +3,19 @@ import type {
 	ContentCheckRepository,
 } from '@/backend/contexts/content-check/domain/gateways/content-check.repository';
 import {
+	type CheckSource,
 	type CheckStatus,
 	ContentCheck,
 } from '@/backend/contexts/content-check/domain/models/content-check.model';
 import { createContentCheckId } from '@/backend/contexts/shared/domain/models/content-check-id.model';
 import type { ContentCheckId } from '@/backend/contexts/shared/domain/models/content-check-id.model';
 import { createUserId } from '@/backend/contexts/shared/domain/models/user-id.model';
-import type { PrismaClient, ContentCheck as PrismaContentCheck, Status } from '@prisma/client';
+import type {
+	PrismaClient,
+	ContentCheck as PrismaContentCheck,
+	Source,
+	Status,
+} from '@prisma/client';
 
 export class PrismaContentCheckRepository implements ContentCheckRepository {
 	constructor(private readonly prisma: PrismaClient) {}
@@ -57,6 +63,7 @@ export class PrismaContentCheckRepository implements ContentCheckRepository {
 		return ContentCheck.reconstruct({
 			id: createContentCheckId(record.id),
 			userId: record.userId ? createUserId(record.userId) : undefined,
+			source: record.source as CheckSource,
 			content: record.originalText,
 			status: record.status as CheckStatus,
 			failedReason: null,
@@ -68,7 +75,7 @@ export class PrismaContentCheckRepository implements ContentCheckRepository {
 	private toPrisma(contentCheck: ContentCheck): {
 		id: string;
 		userId: string | null;
-		source: 'web';
+		source: Source;
 		originalText: string;
 		status: Status;
 		slackChannelId: string | null;
@@ -79,7 +86,7 @@ export class PrismaContentCheckRepository implements ContentCheckRepository {
 		return {
 			id: contentCheck.id as string,
 			userId: (contentCheck.userId as string | undefined) ?? null,
-			source: 'web',
+			source: contentCheck.source as Source,
 			originalText: contentCheck.content,
 			status: contentCheck.status as Status,
 			slackChannelId: null,

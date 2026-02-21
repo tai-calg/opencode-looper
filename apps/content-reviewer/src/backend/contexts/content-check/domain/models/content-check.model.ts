@@ -3,11 +3,14 @@ import type { UserId } from '@/backend/contexts/shared/domain/models/user-id.mod
 
 export type CheckStatus = 'pending' | 'processing' | 'completed' | 'failed';
 
+export type CheckSource = 'web' | 'slack';
+
 export type Result<T, E> = { success: true; value: T } | { success: false; error: E };
 
 export interface ContentCheckProps {
 	readonly id: ContentCheckId;
 	readonly userId: UserId | undefined;
+	readonly source: CheckSource;
 	readonly content: string;
 	readonly status: CheckStatus;
 	readonly failedReason: string | null;
@@ -20,6 +23,7 @@ const MAX_CONTENT_LENGTH = 30000;
 export class ContentCheck {
 	readonly id: ContentCheckId;
 	readonly userId: UserId | undefined;
+	readonly source: CheckSource;
 	readonly content: string;
 	readonly status: CheckStatus;
 	readonly failedReason: string | null;
@@ -29,6 +33,7 @@ export class ContentCheck {
 	private constructor(props: ContentCheckProps) {
 		this.id = props.id;
 		this.userId = props.userId;
+		this.source = props.source;
 		this.content = props.content;
 		this.status = props.status;
 		this.failedReason = props.failedReason;
@@ -39,6 +44,7 @@ export class ContentCheck {
 	static create(props: {
 		id: ContentCheckId;
 		userId?: UserId;
+		source?: CheckSource;
 		content: string;
 	}): Result<ContentCheck, string> {
 		if (!props.content || props.content.trim().length === 0) {
@@ -58,6 +64,7 @@ export class ContentCheck {
 			value: new ContentCheck({
 				id: props.id,
 				userId: props.userId ?? undefined,
+				source: props.source ?? 'web',
 				content: props.content,
 				status: 'pending',
 				failedReason: null,
@@ -130,6 +137,7 @@ export class ContentCheck {
 		return {
 			id: this.id,
 			userId: this.userId,
+			source: this.source,
 			content: this.content,
 			status: this.status,
 			failedReason: this.failedReason,

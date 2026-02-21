@@ -83,6 +83,7 @@ describe('ContentCheck', () => {
 			const check = ContentCheck.reconstruct({
 				id: validId,
 				userId: validUserId,
+				source: 'web',
 				content: 'test content',
 				status: 'pending',
 				failedReason: null,
@@ -104,6 +105,7 @@ describe('ContentCheck', () => {
 			const check = ContentCheck.reconstruct({
 				id: validId,
 				userId: validUserId,
+				source: 'web',
 				content: 'test content',
 				status: 'completed',
 				failedReason: null,
@@ -140,6 +142,7 @@ describe('ContentCheck', () => {
 			const check = ContentCheck.reconstruct({
 				id: validId,
 				userId: validUserId,
+				source: 'web',
 				content: 'test',
 				status: 'processing',
 				failedReason: null,
@@ -160,6 +163,7 @@ describe('ContentCheck', () => {
 			const check = ContentCheck.reconstruct({
 				id: validId,
 				userId: validUserId,
+				source: 'web',
 				content: 'test',
 				status: 'completed',
 				failedReason: null,
@@ -179,6 +183,7 @@ describe('ContentCheck', () => {
 			const check = ContentCheck.reconstruct({
 				id: validId,
 				userId: validUserId,
+				source: 'web',
 				content: 'test',
 				status: 'processing',
 				failedReason: null,
@@ -213,6 +218,7 @@ describe('ContentCheck', () => {
 			const check = ContentCheck.reconstruct({
 				id: validId,
 				userId: validUserId,
+				source: 'web',
 				content: 'test',
 				status: 'completed',
 				failedReason: null,
@@ -250,6 +256,7 @@ describe('ContentCheck', () => {
 			const check = ContentCheck.reconstruct({
 				id: validId,
 				userId: validUserId,
+				source: 'web',
 				content: 'test',
 				status: 'processing',
 				failedReason: null,
@@ -289,6 +296,7 @@ describe('ContentCheck', () => {
 			const check = ContentCheck.reconstruct({
 				id: validId,
 				userId: validUserId,
+				source: 'web',
 				content: 'test',
 				status: 'completed',
 				failedReason: null,
@@ -306,6 +314,7 @@ describe('ContentCheck', () => {
 			const check = ContentCheck.reconstruct({
 				id: validId,
 				userId: validUserId,
+				source: 'web',
 				content: 'test',
 				status: 'failed',
 				failedReason: 'previous error',

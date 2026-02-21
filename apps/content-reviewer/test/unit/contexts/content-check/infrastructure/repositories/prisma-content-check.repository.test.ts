@@ -1,4 +1,5 @@
 import {
+	type CheckSource,
 	type CheckStatus,
 	ContentCheck,
 } from '@/backend/contexts/content-check/domain/models/content-check.model';
@@ -36,6 +37,7 @@ function makeDomainContentCheck(status: CheckStatus = 'pending'): ContentCheck {
 	return Object.assign(Object.create(ContentCheck.prototype), {
 		id: validId,
 		userId: validUserId,
+		source: 'web',
 		content: 'テストコンテンツ',
 		status,
 		failedReason: null,
@@ -130,6 +132,7 @@ describe('PrismaContentCheckRepository', () => {
 			expect(ContentCheck.reconstruct).toHaveBeenCalledWith({
 				id: validId,
 				userId: validUserId,
+				source: 'web',
 				content: 'テストコンテンツ',
 				status: 'pending',
 				failedReason: null,

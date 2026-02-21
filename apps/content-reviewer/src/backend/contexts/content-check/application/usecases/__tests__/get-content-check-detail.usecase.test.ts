@@ -23,6 +23,7 @@ function buildContentCheck(): ContentCheck {
 	return ContentCheck.reconstruct({
 		id: createContentCheckId(CHECK_ID),
 		userId: createUserId(USER_ID),
+		source: 'web',
 		content: 'サンプルコンテンツです。',
 		status: 'completed',
 		failedReason: null,
