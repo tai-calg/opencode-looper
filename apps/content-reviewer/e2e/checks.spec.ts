@@ -73,8 +73,11 @@ test.describe('/checks/new → /checks/[id] フロー', () => {
 			await expect(progressIndicator).toBeVisible();
 		}
 
-		// 完了後 /checks/[id] にリダイレクトされる
-		await page.waitForURL(/\/checks\/[a-zA-Z0-9-]+$/, { timeout: 90000 });
+		// 完了後 /checks/[id] にリダイレクトされる（UUID形式のIDページに遷移、/checks/newは除外）
+		await page.waitForURL(
+			/\/checks\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+			{ timeout: 90000 },
+		);
 
 		// 詳細ページの要素が表示される
 		await expect(page.getByRole('heading', { name: 'チェック結果詳細' })).toBeVisible();

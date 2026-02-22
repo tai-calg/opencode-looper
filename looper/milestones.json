@@ -460,7 +460,7 @@
         "id": "slack-contracts",
         "description": "Slack 連携に必要な契約定義。(1) src/backend/contexts/content-check/domain/gateways/slack.gateway.ts を新規作成: SlackGateway interface（postMessage(channelId: string, threadTs: string, text: string): Promise<void>）を定義。(2) src/backend/contexts/content-check/domain/models/content-check.model.ts の ContentCheckProps に slackChannelId: string | null と slackThreadTs: string | null を追加し、ContentCheck.create() の props にも slack フィールドを追加（既存コードとの後方互換を保つため省略可能にする）。W2 以降の全タスクがこれらの型定義を参照する",
         "wave": 1,
-        "done": false
+        "done": true
       },
       {
         "id": "slack-web-api-gateway",
