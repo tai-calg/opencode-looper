@@ -28,6 +28,8 @@ export class PrismaContentCheckRepository implements ContentCheckRepository {
 			create: data,
 			update: {
 				status: data.status,
+				slackChannelId: data.slackChannelId,
+				slackThreadTs: data.slackThreadTs,
 				updatedAt: data.updatedAt,
 			},
 		});
