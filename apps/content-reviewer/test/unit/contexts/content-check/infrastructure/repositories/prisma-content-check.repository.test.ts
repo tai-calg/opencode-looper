@@ -88,6 +88,8 @@ describe('PrismaContentCheckRepository', () => {
 				},
 				update: {
 					status: 'pending',
+					slackChannelId: null,
+					slackThreadTs: null,
 					updatedAt: now,
 				},
 			});
@@ -103,6 +105,29 @@ describe('PrismaContentCheckRepository', () => {
 			const call = (prisma.contentCheck.upsert as ReturnType<typeof vi.fn>).mock.calls[0][0];
 			expect(call.create.status).toBe('processing');
 			expect(call.update.status).toBe('processing');
+		});
+
+		it('should include slackChannelId and slackThreadTs in update when set', async () => {
+			const prisma = createMockPrisma();
+			const repo = new PrismaContentCheckRepository(prisma);
+			const contentCheck = Object.assign(Object.create(ContentCheck.prototype), {
+				id: validId,
+				userId: validUserId,
+				source: 'slack',
+				content: 'テストコンテンツ',
+				status: 'pending',
+				failedReason: null,
+				slackChannelId: 'C1234567890',
+				slackThreadTs: '1234567890.123456',
+				createdAt: now,
+				updatedAt: now,
+			}) as ContentCheck;
+
+			await repo.save(contentCheck);
+
+			const call = (prisma.contentCheck.upsert as ReturnType<typeof vi.fn>).mock.calls[0][0];
+			expect(call.update.slackChannelId).toBe('C1234567890');
+			expect(call.update.slackThreadTs).toBe('1234567890.123456');
 		});
 	});
 
@@ -162,6 +187,29 @@ describe('PrismaContentCheckRepository', () => {
 				expect.objectContaining({ userId: undefined }),
 			);
 			expect(result).toBe(mockContentCheck);
+		});
+
+		it('should map slackChannelId and slackThreadTs from record to domain', async () => {
+			const record = makePrismaRecord({
+				slackChannelId: 'C1234567890',
+				slackThreadTs: '1234567890.123456',
+			});
+			const mockContentCheck = makeDomainContentCheck();
+			vi.spyOn(ContentCheck, 'reconstruct').mockReturnValue(mockContentCheck);
+
+			const prisma = createMockPrisma({
+				findUnique: vi.fn().mockResolvedValue(record),
+			});
+			const repo = new PrismaContentCheckRepository(prisma);
+
+			await repo.findById(validId);
+
+			expect(ContentCheck.reconstruct).toHaveBeenCalledWith(
+				expect.objectContaining({
+					slackChannelId: 'C1234567890',
+					slackThreadTs: '1234567890.123456',
+				}),
+			);
 		});
 	});
 
