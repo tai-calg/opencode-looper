@@ -9,14 +9,6 @@
 **Milestone**: __MILESTONE__
 **マージ対象ブランチ**: __BRANCHES__
 
-## ステップ0: 設計規約の把握
-
-`docs/` 配下の設計ルールを読み、マージ時のコンフリクト解決やコード品質判断の基準とする:
-- [docs/architecture.md](docs/architecture.md): アーキテクチャ（DDD 4層・依存ルール・命名規約）
-- [docs/frontend.md](docs/frontend.md): フロントエンド
-- [docs/infrastructure.md](docs/infrastructure.md): インフラストラクチャ
-- [docs/quality.md](docs/quality.md): 品質
-
 ## ステップ1: 申し送りの確認
 
 上記「マージ対象ブランチ」の各ブランチについて、Builder エージェントが残した申し送りを読んでください:
@@ -35,7 +27,12 @@ git log --format="%s%n%b" HEAD..worktree/{task-id}
 git merge --no-edit worktree/{task-id}
 ```
 
-- マージコンフリクトが発生した場合: 両方の変更内容を理解し、適切に統合して解決する
+- マージコンフリクトが発生した場合: まず `docs/` 配下の設計規約を読んでから解決する（正しい統合判断に設計知識が必要なため）:
+  - [docs/architecture.md](docs/architecture.md): アーキテクチャ（DDD 4層・依存ルール・命名規約）
+  - [docs/frontend.md](docs/frontend.md): フロントエンド
+  - [docs/infrastructure.md](docs/infrastructure.md): インフラストラクチャ
+  - [docs/quality.md](docs/quality.md): 品質
+  - 両方の変更内容を理解し、規約に沿って適切に統合して解決する
 - 解決不可能なコンフリクト: `git merge --abort` して、そのブランチはスキップする
 - マージ成功したタスクは `looper/milestones.json` の該当タスクの `done` を `true` に更新する
 - マージ失敗したタスクは `done: false` のまま残す（次のラウンドでリトライされる）
@@ -96,9 +93,11 @@ lsof -ti:3000 | xargs kill -9 2>/dev/null || true
 
 ### チェック失敗した場合
 
-1. エラーの根本原因を分析し、**修正の規模を判断** する。
+1. まだ `docs/` を読んでいなければ、設計規約を読んで修正判断の基準とする:
+   - [docs/architecture.md](docs/architecture.md), [docs/frontend.md](docs/frontend.md), [docs/infrastructure.md](docs/infrastructure.md), [docs/quality.md](docs/quality.md)
+2. エラーの根本原因を分析し、**修正の規模を判断** する。
 
-2. 判断基準に従い、**自分で直すか Builder に委任するか** を決める:
+3. 判断基準に従い、**自分で直すか Builder に委任するか** を決める:
 
 #### ステップ4.1: 自分で修正する（軽微な問題の場合）
 

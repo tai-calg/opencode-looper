@@ -11,6 +11,11 @@
 
 set -euo pipefail
 
+# スリープ防止（API接続断によるタイムアウトを回避）
+caffeinate -s -w $$ &
+CAFFEINATE_PID=$!
+trap "kill $CAFFEINATE_PID 2>/dev/null" EXIT
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 PLAN="$SCRIPT_DIR/milestones.json"
@@ -80,16 +85,18 @@ for milestone in $(jq -r '.[]|select(.done==false)|.milestone' "$PLAN"); do
 	log "ゴール: $goal"
 
 	# ① Planner
+	plan_doc="docs/tasks/milestone-${milestone}.md"
 	task_count=$(jq --argjson m "$milestone" '[.[]|select(.milestone==$m)|.tasks[]?]|length' "$PLAN")
 	if [ "$task_count" -eq 0 ]; then
-		log "Planner: Milestone $milestone のタスクを設計中..."
+		log "Planner: Milestone $milestone の設計ドキュメント作成中..."
 		prompt=$(<"$SCRIPT_DIR/prompts/planner.md")
 		prompt="${prompt//__MILESTONE__/$milestone}"
 		prompt="${prompt//__GOAL__/$goal}"
 		run_claude "$prompt" "$LOG_DIR/plan-milestone${milestone}.log"
 		task_count=$(jq --argjson m "$milestone" '[.[]|select(.milestone==$m)|.tasks[]?]|length' "$PLAN")
 		[ "$task_count" -eq 0 ] && die "Planner が Milestone $milestone のタスクを生成しませんでした"
-		log "Planner: ${task_count} タスク生成"
+		[ -f "$plan_doc" ] || die "Planner が設計ドキュメント $plan_doc を生成しませんでした"
+		log "Planner: ${task_count} タスク生成 + 設計ドキュメント作成"
 	fi
 
 	# ② ③ Wave ループ
@@ -113,6 +120,7 @@ for milestone in $(jq -r '.[]|select(.done==false)|.milestone' "$PLAN"); do
 
 		# worktree 作成 + Builder 並列実行
 		builder_prompt_tpl=$(<"$SCRIPT_DIR/prompts/builder.md")
+		builder_pids=()
 		for id in "${batch[@]}"; do
 			wt="$WT_BASE/$id"
 			git worktree remove "$wt" --force 2>/dev/null || true
@@ -124,11 +132,13 @@ for milestone in $(jq -r '.[]|select(.done==false)|.milestone' "$PLAN"); do
 				'.[]|select(.milestone==$m)|.tasks[]|select(.id==$id)|.description' "$PLAN")
 			prompt="${builder_prompt_tpl//__TASK_ID__/$id}"
 			prompt="${prompt//__TASK_DESC__/$desc}"
+			prompt="${prompt//__PLAN_DOC__/$plan_doc}"
 
 			log "Builder: $id 起動"
 			(cd "$wt" && run_claude "$prompt" "$LOG_DIR/$id.log") &
+			builder_pids+=($!)
 		done
-		wait
+		wait "${builder_pids[@]}"
 		log "Builder: 全セッション完了"
 
 		# コミットのあるブランチだけ Verifier に渡す
