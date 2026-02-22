@@ -25,32 +25,7 @@ Claude Code による自律開発ループ。3 エージェント（計画→並
 
 スクリプト（bash）が担うのは worktree 作成とプロセス起動だけ。判断は全てエージェントが行います。
 
-### Milestone と Wave
-
-- **Milestone** — 「1 つの機能が動く」単位。直列に進む（M1 完了 → M2 開始）
-- **Wave** — Milestone 内の依存順序。同 Wave のタスクは Git worktree で並列実行される
-
-```
-Milestone 1
-  Wave 1: interface / 型定義（契約）
-  Wave 2: 独立した実装を並列実行
-  Wave 3: 統合・テスト
-Milestone 2
-  ...
-```
-
-### 検証の 2 段階
-
-| コマンド | 実行者 | 内容 | DB 必要 |
-|---|---|---|---|
-| `pnpm verify` | Builder | lint → prisma generate → typecheck → build → unit test | No |
-| `pnpm verify:full` | Verifier | `pnpm verify` + E2E テスト | Yes（ローカル Supabase） |
-
-Builder は worktree で動くため DB 不要の `pnpm verify` でセルフチェック。Verifier は本体ブランチで `pnpm verify:full`（E2E あり）で完全検証する。
-
-### 自己修復
-
-Verifier の検証が失敗すると fix タスクが自動生成され、次のラウンドで Builder がリトライします。
+動作原理の詳細は [looper/README.md](looper/README.md) を参照。
 
 ## 使い方
 
@@ -94,34 +69,41 @@ watch -n3 bash looper/monitor.sh
 ## ファイル構成
 
 ```
-looper/
-├── run.sh              # オーケストレーション（worktree 作成・プロセス起動）
-├── monitor.sh          # Builder セッションのリアルタイム監視
-├── milestones.json     # Milestone / Task の定義と進捗
-├── prompts/
-│   ├── planner.md      # Planner エージェントプロンプト
-│   ├── builder.md      # Builder エージェントプロンプト
-│   └── verifier.md     # Verifier エージェントプロンプト
-├── output/             # Verifier が保存する UI 動作確認の録画
-└── sessions/           # Builder のセッションログ
+looper/                     # 開発ループエンジン（詳細は looper/README.md）
+├── run.sh                  #   オーケストレーション
+├── monitor.sh              #   リアルタイム監視
+└── prompts/                #   エージェントプロンプト
 
-docs/                   # 設計規約（エージェントが毎セッション読む）
-├── architecture.md     # DDD 4層・依存ルール・命名規約
-├── frontend.md         # フロントエンド規約
-├── infrastructure.md   # インフラ規約
-└── quality.md          # 品質規約
+docs/                       # 設計規約（エージェントが毎セッション読む）
+├── architecture.md         #   DDD 4層・依存ルール・命名規約
+├── frontend.md             #   フロントエンド規約
+├── infrastructure.md       #   インフラ規約
+└── quality.md              #   品質規約
 
-.claude/commands/       # Claude Code スラッシュコマンド
-├── plan.md             # /plan — 設計ドキュメント作成
-└── gen-milestones.md   # /gen-milestones — Milestone 生成
+.claude/commands/           # Claude Code スラッシュコマンド
+├── plan.md                 #   /plan — 設計ドキュメント作成
+├── gen-milestones.md       #   /gen-milestones — Milestone 生成
+└── pr.md                   #   /pr — フィーチャーブランチ作成・PR
 ```
+
+## 想定技術スタック
+
+同梱の `docs/` やプロンプトは以下のスタックを前提に書かれています:
+
+- TypeScript / Next.js App Router
+- Supabase（PostgreSQL + Auth）
+- Prisma
+- pnpm workspace（monorepo）
+- Biome / Vitest / Playwright
+
+ループエンジン自体（`looper/run.sh`）は言語やフレームワークに依存しません。`docs/`・`prompts/`・`CLAUDE.md` を書き換えれば、どのような言語・フレームワークでも動作するはずです。
 
 ## カスタマイズ
 
 このリポジトリをフォークして以下を自分のプロジェクトに合わせてください:
 
-- **`docs/`** — 設計規約。DDD・Next.js 等は筆者のプロジェクト向けの例です
-- **`looper/prompts/`** — エージェントプロンプト。検証コマンドやコミットメッセージ規約など
+- **`docs/`** — 設計規約。エージェントが毎セッション読むルールブック
+- **`looper/prompts/`** — エージェントプロンプト。検証コマンド（`pnpm verify` 等）やコミットメッセージ規約など
 - **`CLAUDE.md`** — プロジェクト固有のコーディング規約
 
 ## 注意事項
