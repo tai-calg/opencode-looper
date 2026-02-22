@@ -466,19 +466,19 @@
         "id": "slack-web-api-gateway",
         "description": "Slack Web API を使ったメッセージ投稿の Gateway 実装。apps/content-reviewer/package.json に @slack/web-api を追加し pnpm install を実行。src/backend/contexts/content-check/infrastructure/slack-web-api.gateway.ts に SlackWebApiGateway implements SlackGateway を新規作成: コンストラクタで WebClient（@slack/web-api）を初期化（SLACK_BOT_TOKEN を利用）。postMessage(channelId, threadTs, text) で client.chat.postMessage({ channel: channelId, thread_ts: threadTs, text }) を呼び出す。SLACK_BOT_TOKEN が未設定・'dummy'・'test' の場合はスタブモードとしてログ出力のみ行い実際のAPI呼び出しをスキップする",
         "wave": 2,
-        "done": false
+        "done": true
       },
       {
         "id": "slack-signature-verification",
         "description": "Slack リクエスト署名検証ユーティリティの実装。src/lib/slack-signature.ts を新規作成: verifySlackSignature(signingSecret: string, signature: string, timestamp: string, rawBody: string): boolean を実装（node:crypto の createHmac('sha256', signingSecret) で v0:{timestamp}:{rawBody} を署名し x-slack-signature ヘッダーの値と timingSafeEqual で比較。タイムスタンプが5分以上古い場合は false を返す）。src/lib/env.ts を更新して getSlackSigningSecret(): string（SLACK_SIGNING_SECRET）と getSlackBotToken(): string（SLACK_BOT_TOKEN）を追加する",
         "wave": 2,
-        "done": false
+        "done": true
       },
       {
         "id": "content-check-slack-fields-repository",
         "description": "ContentCheck ドメインモデルと Repository への Slack フィールド反映。(1) src/backend/contexts/content-check/domain/models/content-check.model.ts を更新: W1 で追加した slackChannelId / slackThreadTs フィールドをコンストラクタ・create()・reconstruct()・startProcessing()・complete()・fail() の各メソッドで正しく受け渡す実装を追加する。(2) src/backend/contexts/content-check/infrastructure/repositories/prisma-content-check.repository.ts を更新: toDomain() で record.slackChannelId / record.slackThreadTs をドメインモデルにマッピング。toPrisma() で contentCheck.slackChannelId / contentCheck.slackThreadTs を Prisma データにマッピングする。(3) save() の upsert update 句に slackChannelId と slackThreadTs を含める",
         "wave": 2,
-        "done": false
+        "done": true
       },
       {
         "id": "notify-slack-usecase",

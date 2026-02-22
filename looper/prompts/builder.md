@@ -8,9 +8,15 @@
 
 ## ステップ1: 状況把握
 
-1. `docs/` 配下を全て読み、フレームワーク共通の設計規約（DDD 4層・依存ルール・命名規約・フロントエンド・インフラ）を把握する
-2. `CLAUDE.md` を読み、プロジェクト固有のコーディング規約を確認する
-3. `docs/` 配下のドキュメントを読み、ドメイン固有の設計方針を理解する
+1. `CLAUDE.md` を読み、プロジェクト固有のコーディング規約を確認する
+2. `docs/` 配下の設計ルールを、タスクに関連するものだけ読む:
+   - [docs/architecture.md](docs/architecture.md): アーキテクチャ（DDD 4層・依存ルール・命名規約）
+   - [docs/frontend.md](docs/frontend.md): フロントエンド
+   - [docs/infrastructure.md](docs/infrastructure.md): インフラストラクチャ
+   - [docs/quality.md](docs/quality.md): 品質
+3. アプリ仕様を把握する:
+   - `docs/tasks/` 配下のうち、日付が最新のファイルを読む
+   - `looper/milestones.json` を読む
 4. 既存コードを Glob/Grep で調査し、現在の実装状況を把握する
 5. git log --oneline -20 で直近の作業を確認する
 

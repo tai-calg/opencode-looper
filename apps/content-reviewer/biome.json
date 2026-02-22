@@ -21,6 +21,6 @@
 		}
 	},
 	"files": {
-		"ignore": [".next/", "node_modules/", "next-env.d.ts", "test-results/"]
+		"ignore": [".next/", "node_modules/", "next-env.d.ts", "test-results/", "playwright-report/"]
 	}
 }

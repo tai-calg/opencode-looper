@@ -18,7 +18,11 @@
       "Bash(docker exec:*)",
       "Bash(pnpm test:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(while read hash msg)",
+      "Bash(do echo \"=== $hash $msg ===\")",
+      "Read(//Users/j-ito/work/claude-looper/**)",
+      "Bash(claude mcp:*)"
     ]
   }
 }

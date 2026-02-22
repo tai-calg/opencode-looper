@@ -11,7 +11,11 @@
 
 ## ステップ0: 設計規約の把握
 
-`docs/` 配下を全て読み、フレームワーク共通の設計規約（DDD 4層・依存ルール・命名規約）を把握する。マージ時のコンフリクト解決やコード品質判断の基準とする。
+`docs/` 配下の設計ルールを読み、マージ時のコンフリクト解決やコード品質判断の基準とする:
+- [docs/architecture.md](docs/architecture.md): アーキテクチャ（DDD 4層・依存ルール・命名規約）
+- [docs/frontend.md](docs/frontend.md): フロントエンド
+- [docs/infrastructure.md](docs/infrastructure.md): インフラストラクチャ
+- [docs/quality.md](docs/quality.md): 品質
 
 ## ステップ1: 申し送りの確認
 
@@ -69,44 +73,23 @@ lsof -ti:3000 | xargs kill -9 2>/dev/null || true
 
 > **注意:** `supabase` コマンドはグローバルインストールされていない。必ず `pnpm supabase` 経由で実行すること（pnpm が node_modules/.bin を解決する）。
 
-## ステップ3.5: UI の動作確認（UIの変更を伴う場合のみ）
-
-マージされたタスクに UI の変更が含まれる場合、Playwright MCP を用いて実際にブラウザを起動し、変更箇所の動作を確認する。
-
-- 初期ページ（トップページ等）へのアクセスのみ `page.goto()` を許可する
-- それ以降の画面遷移は UI 上のクリック操作で行うこと（URL の直接アクセスは禁止）
-- 期待通りに動作しない場合は、ステップ5の「チェック失敗した場合」と同様に fix タスクを追加する
-
-### UI 動画の録画（動作確認が全て成功した場合のみ）
-
-動作確認が全て成功したら、録画モードで同じ操作を再実行し、動画を `looper/output/` に保存する。
-**失敗時は録画しない。** 成功を確認してから録画する。
-
-手順:
-
-1. タイムスタンプを取得する:
-   ```bash
-   TIMESTAMP=$(TZ=Asia/Tokyo date +%Y%m%d_%H%M%S)
-   ```
-2. Playwright MCP の `browser_start_recording` で録画を開始する
-3. 成功した動作確認と同じ操作を再実行する
-4. Playwright MCP の `browser_save_recording` で `looper/output/${TIMESTAMP}_milestone__MILESTONE__.webm` に保存する
-
-## ステップ4: `pnpm verify` の改善
-
-検証結果に関わらず、毎回以下を考える:
-
-- 今回の検証で **`pnpm verify` が見逃した問題** はなかったか？（手動で気づいたがコマンドでは検出できなかった等）
-- 今回マージされたコードに対して **追加すべきチェック** はないか？（例: `prisma generate` が必要になった、e2e テストが追加された等）
-
-改善すべき点があれば、ルート package.json の `verify` スクリプトを更新する。
-
-## ステップ5: 結果に応じた処理
+## ステップ4: 結果に応じた処理
 
 ### 全チェック通過した場合
 
-1. `looper/milestones.json` を確認し、この Milestone の全タスクが `done: true` なら Milestone の `done` も `true` に更新する
-2. 全ての変更をコミットする:
+`looper/milestones.json` を読み、この Milestone（`__MILESTONE__`）の **全タスク** の `done` 状態を確認する。
+
+**A. 未完了タスクが残っている場合（Wave 途中）:**
+1. 変更をコミットする:
+   ```
+   git add -A && git commit -m "chore: Milestone __MILESTONE__ wave verified"
+   ```
+2. 終了（run.sh が次の Wave を起動する）
+
+**B. 全タスクが `done: true` の場合（Milestone 完了）:**
+1. Milestone の `done` を `true` に更新する
+2. ステップ4.5（UI 動作確認）に進む
+3. UI 動作確認後、全ての変更をコミットする:
    ```
    git add -A && git commit -m "chore: Milestone __MILESTONE__ verified"
    ```
@@ -117,7 +100,7 @@ lsof -ti:3000 | xargs kill -9 2>/dev/null || true
 
 2. 判断基準に従い、**自分で直すか Builder に委任するか** を決める:
 
-#### ステップ5.1: 自分で修正する（軽微な問題の場合）
+#### ステップ4.1: 自分で修正する（軽微な問題の場合）
 
 以下のような修正は、Builder に往復させるよりも自分で直して再検証したほうが速い。
 **積極的に自分で修正すること。**
@@ -151,9 +134,9 @@ lsof -ti:3000 | xargs kill -9 2>/dev/null || true
    git add -A && git commit -m "fix(verifier): 修正内容の要約"
    ```
 4. 再検証も失敗した場合、原因が同じ系統なら **もう一度修正を試みてよい（最大 3 回まで）**
-5. 3 回修正しても解決しない、または原因がより根深いと判断した場合は、ステップ 5.2 に進む
+5. 3 回修正しても解決しない、または原因がより根深いと判断した場合は、ステップ 4.2 に進む
 
-#### ステップ5.2: fix タスクを Builder に委任する
+#### ステップ4.2: fix タスクを Builder に委任する
 
 以下のような修正は自分では行わず、Builder に委任する:
 
@@ -183,10 +166,62 @@ lsof -ti:3000 | xargs kill -9 2>/dev/null || true
    ```json
    {"id": "fix-具体的な内容", "description": "エラー原因と修正方針を具体的に記述", "wave": N, "done": false}
    ```
-   wave は **検証失敗した wave N** にする。同時に、wave >= N の未完了タスク全ての wave を **+1** する（fix を先に実行してから後続を再開するため）。
+   wave は **検証失敗した wave N** にする。**他のタスクの wave は変更しない。** run.sh は `min(未完了タスクの wave)` で次の wave を決めるため、fix タスクが done にならない限り後続 wave は実行されない。fix と同じ wave に未完了タスクがある場合は並列実行されるが、fix は独立した修正なので問題ない。
 3. 変更をコミットする:
    ```
    git add -A && git commit -m "chore: Milestone __MILESTONE__ verification failed — fix tasks added"
+   ```
+
+## ステップ4.5: UI の動作確認（Milestone 完了時のみ）
+
+**このステップは Milestone の全タスクが `done: true` になった場合のみ実行する。** Wave 途中の検証では実行しない。
+
+E2E テストは「事前定義シナリオの回帰テスト」であり、レイアウト崩れや CSS の重なりなど視覚的な問題は検出できない。Milestone 完了時に Playwright MCP で実際の画面を確認し、E2E では拾えない問題を検出する。
+
+### 動作確認
+
+Playwright MCP を用いて実際にブラウザを起動し、この Milestone で変更された画面を確認する。
+
+- 初期ページ（トップページ等）へのアクセスのみ `page.goto()` を許可する
+- それ以降の画面遷移は UI 上のクリック操作で行うこと（URL の直接アクセスは禁止）
+- 期待通りに動作しない場合は、ステップ4.2 と同様に fix タスクを追加する（Milestone の `done` は `true` にしない）
+
+### UI 動作の録画（動作確認が全て成功した場合のみ）
+
+動作確認が全て成功したら、Playwright MCP の `browser_run_code` で動画を録画し MP4 に変換して `looper/output/` に保存する。
+**失敗時は録画しない。** 成功を確認してから録画する。
+
+手順:
+
+1. タイムスタンプを取得し、出力ディレクトリを作成する:
+   ```bash
+   TIMESTAMP=$(TZ=Asia/Tokyo date +%Y%m%d_%H%M%S)
+   mkdir -p looper/output
+   ```
+
+2. Playwright MCP の `browser_run_code` で、録画付きの新しいブラウザコンテキストを起動し、動作確認と同じ操作を再実行する:
+   ```javascript
+   async (page) => {
+     const context = await page.context().browser().newContext({
+       recordVideo: { dir: '/tmp/playwright-videos/', size: { width: 1280, height: 720 } }
+     });
+     const p = await context.newPage();
+     await p.goto('http://localhost:3000');
+     // ... 動作確認と同じ操作を実行 ...
+     await p.waitForTimeout(1000);
+     await context.close(); // close() で録画ファイルが確定する
+     return 'recording done';
+   }
+   ```
+
+3. webm を MP4 に変換する:
+   ```bash
+   VIDEO_FILE=$(ls -t /tmp/playwright-videos/*.webm | head -1)
+   ffmpeg -i "$VIDEO_FILE" \
+     -c:v libx264 -pix_fmt yuv420p \
+     "looper/output/${TIMESTAMP}_milestone__MILESTONE__.mp4" \
+     -y
+   rm -f "$VIDEO_FILE"
    ```
 
 ## 絶対に守ること

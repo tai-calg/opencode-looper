@@ -18,7 +18,7 @@ pnpm workspace + Next.js App Router + Vercel + DDD を前提とし、3 エージ
 |---|---|---|
 | **Planner** | Milestone のゴールからタスクを Wave 構造で設計 | コードは一切書かない |
 | **Builder** | 1 タスク = 1 セッションで実装。worktree 内で隔離実行 | 割り当てタスクのみ。他タスクに手を出さない |
-| **Verifier** | Builder ブランチをマージし品質検証。失敗時は fix タスクを生成 | 大規模修正はしない。修正は Builder に委任 |
+| **Verifier** | Builder ブランチをマージし品質検証。軽微な修正は自分で行い、設計変更は fix タスクとして Builder に委任 | ドメインモデル・UseCase・Repository のロジックは変更しない |
 
 ### Milestone × Wave による依存制御
 
@@ -32,7 +32,103 @@ pnpm workspace + Next.js App Router + Vercel + DDD を前提とし、3 エージ
 
 ### 自己修復ループ
 
-Verifier が品質検証に失敗すると fix タスクを `milestones.json` に追加し、次ラウンドで Builder がリトライする。人間の介入なしにループが回り続ける。
+Verifier が品質検証に失敗すると、軽微な問題（テストコード・型アノテーション等）は自分で修正して再検証する。設計やロジックの変更が必要な場合は fix タスクを `milestones.json` に追加し、次ラウンドで Builder がリトライする。
+
+---
+
+## ループ構造の全体像
+
+```
+Milestone N
+│
+├─ Planner (tasks == 0 の場合のみ)
+│   └─ milestones.json にタスク追加
+│
+└─ Wave ループ
+    │
+    ├─ Wave 1 (契約: interface / 型定義)
+    │   ├─ Builder A ─── worktree/task-a ─── pnpm verify ─── commit
+    │   └─ Builder B ─── worktree/task-b ─── pnpm verify ─── commit
+    │        ↓
+    │   Verifier
+    │   ├─ マージ（直列）
+    │   ├─ pnpm verify:full（lint + typecheck + build + unit test + E2E）
+    │   └─ 結果判定
+    │       ├─ 全 pass → 次の Wave へ
+    │       ├─ 軽微な失敗 → 自分で修正して再検証（最大3回）
+    │       └─ 設計問題 → fix タスク追加 → Wave ループ再開
+    │
+    ├─ Wave 2 (並列実装: 最大8並列)
+    │   ├─ Builder C ─── worktree/task-c
+    │   ├─ Builder D ─── worktree/task-d
+    │   ├─ Builder E ─── worktree/task-e
+    │   └─ ...
+    │        ↓
+    │   Verifier（同上）
+    │
+    └─ Wave N (統合・テスト)
+        └─ ...
+             ↓
+        Verifier → 全タスク done
+             ↓
+        UI 動作確認（Playwright MCP） ← Milestone 完了時のみ
+             ↓
+        Milestone done + MP4 録画
+
+Milestone N+1 へ
+```
+
+### テスト種別と実行タイミング
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    pnpm verify                          │
+│  (Builder: worktree 内で実行。DB 不要)                     │
+│                                                         │
+│  ┌──────────┐ ┌────────────┐ ┌───────┐ ┌────────────┐  │
+│  │ Biome    │ │ prisma     │ │ tsc   │ │ vitest run │  │
+│  │ lint     │ │ generate   │ │       │ │ (unit test)│  │
+│  └──────────┘ └────────────┘ └───────┘ └────────────┘  │
+└─────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────┐
+│                  pnpm verify:full                        │
+│  (Verifier: メインブランチで実行。ローカル Supabase 必要)     │
+│                                                         │
+│  ┌──────────────────────────────────────────┐           │
+│  │ pnpm verify (上記すべて)                   │           │
+│  └──────────────────────────────────────────┘           │
+│  ┌──────────────────────────────────────────┐           │
+│  │ playwright test (E2E)                     │           │
+│  │  ・Next.js dev server 起動                 │           │
+│  │  ・ローカル Supabase (PostgreSQL + Auth)    │           │
+│  │  ・ブラウザ操作による統合テスト              │           │
+│  └──────────────────────────────────────────┘           │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Builder は worktree 上で動くため DB に接続できない。** `pnpm verify`（lint / typecheck / build / unit test）でセルフチェックし、E2E を含む完全検証は Verifier がメインブランチで行う。
+
+### Verifier の修正権限
+
+検証失敗時、Verifier は問題の種類に応じて自分で修正するか Builder に委任するかを判断する:
+
+```
+検証失敗
+│
+├─ 軽微な問題 → Verifier が自分で修正（最大3回）
+│   ├─ テストコード: セレクタ修正、force:true 追加、アサーション修正
+│   ├─ 型エラー: import 追加、型アノテーション修正、as キャスト
+│   ├─ lint エラー: 未使用変数削除、typo 修正
+│   └─ 設定: tsconfig / biome / playwright.config の修正
+│   （条件: 3ファイル以内、ビジネスロジック変更なし）
+│
+└─ 設計・ロジックの問題 → fix タスクを追加して Builder に委任
+    ├─ ドメインモデル / UseCase / Repository の変更
+    ├─ 複数レイヤーにまたがる修正
+    ├─ 新規ファイル・コンポーネントの作成
+    └─ 環境・インフラ構築
+```
 
 ---
 
