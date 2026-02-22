@@ -13,3 +13,19 @@ export function getSupabaseAnonKey(): string {
 	}
 	return key;
 }
+
+export function getSlackSigningSecret(): string {
+	const secret = process.env.SLACK_SIGNING_SECRET;
+	if (!secret) {
+		throw new Error('Missing environment variable: SLACK_SIGNING_SECRET');
+	}
+	return secret;
+}
+
+export function getSlackBotToken(): string {
+	const token = process.env.SLACK_BOT_TOKEN;
+	if (!token) {
+		throw new Error('Missing environment variable: SLACK_BOT_TOKEN');
+	}
+	return token;
+}

@@ -36,4 +36,34 @@ describe('env', () => {
 			);
 		});
 	});
+
+	describe('getSlackSigningSecret', () => {
+		it('returns the env var value when set', async () => {
+			vi.stubEnv('SLACK_SIGNING_SECRET', 'test-signing-secret');
+			const { getSlackSigningSecret } = await import('@/lib/env');
+			expect(getSlackSigningSecret()).toBe('test-signing-secret');
+		});
+
+		it('throws when env var is missing', async () => {
+			vi.stubEnv('SLACK_SIGNING_SECRET', '');
+			const { getSlackSigningSecret } = await import('@/lib/env');
+			expect(() => getSlackSigningSecret()).toThrow(
+				'Missing environment variable: SLACK_SIGNING_SECRET',
+			);
+		});
+	});
+
+	describe('getSlackBotToken', () => {
+		it('returns the env var value when set', async () => {
+			vi.stubEnv('SLACK_BOT_TOKEN', 'xoxb-test-token');
+			const { getSlackBotToken } = await import('@/lib/env');
+			expect(getSlackBotToken()).toBe('xoxb-test-token');
+		});
+
+		it('throws when env var is missing', async () => {
+			vi.stubEnv('SLACK_BOT_TOKEN', '');
+			const { getSlackBotToken } = await import('@/lib/env');
+			expect(() => getSlackBotToken()).toThrow('Missing environment variable: SLACK_BOT_TOKEN');
+		});
+	});
 });
