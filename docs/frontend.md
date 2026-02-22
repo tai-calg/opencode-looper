@@ -46,4 +46,5 @@ action が UseCase の `onProgress` コールバックを `ReadableStream` + SSE
 
 - **shadcn/ui**: コンポーネントライブラリ。`components/ui/` に配置
 - **Tailwind CSS**: スタイリング。カスタム CSS は原則不要
+- **Lucide React**: アイコン。`lucide-react` からインポートして使用
 - **Biome**: lint / format（タブインデント、シングルクォート、セミコロン必須）

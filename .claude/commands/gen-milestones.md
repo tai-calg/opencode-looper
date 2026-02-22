@@ -84,7 +84,7 @@ Milestone の境界は「次の Milestone が前の Milestone の成果物を im
 
 ### 構成パターン
 
-1. **基盤 Milestone**: プロジェクト構成、ツールチェーン、認証など横断的な基盤。`docs/quality.md` で定義された品質チェックツール（dependency-cruiser 等）のセットアップも含め、verification コマンドが通る状態にすること
+1. **基盤 Milestone**: プロジェクト構成、ツールチェーン、認証など横断的な基盤。`docs/quality.md` で定義された品質チェックツール（dependency-cruiser 等）のセットアップも含め、verification コマンドが通る状態にすること。DB を使うプロジェクトでは、ローカル DB のセットアップ（`supabase init` 等）もこの Milestone に含め、以降の Milestone で DB が使える状態にする。**環境変数の初期化もこの Milestone に含める**（後述「環境変数の初期化」を参照）
 2. **最初の機能 Milestone**: 最もシンプルな機能を1つ選び、model → repository → usecase → UI を縦に通す。ここで全レイヤーの実装パターンが確立される
 3. **追加機能 Milestone**: 確立したパターンに乗せて、1 Milestone = 1機能ずつ追加していく
 
@@ -92,15 +92,25 @@ Milestone の境界は「次の Milestone が前の Milestone の成果物を im
 
 **各 Milestone のゴールは「実際に動作確認できる状態」でなければならない。**
 
-コードが存在するだけでは不十分。外部サービス（認証、DB、API 等）を使う機能は、その Milestone 内で実際に接続して動作する状態を求める。「開発環境では○○をスキップ」「ダミーで代替」は原則禁止。動かせない外部依存がある場合は、その機能自体を後の Milestone に回す。
+コードが存在するだけでは不十分。`pnpm dev` して実際にその機能を手で触って確認できること。
 
-**判断基準: その Milestone が完了したとき、開発者が `pnpm dev` して実際にその機能を手で触って確認できるか？**
+- DB 永続化なら → ローカル Supabase で実際にデータが保存・表示される
+- 外部 API 連携なら → **API キーがあれば本物の API で動作し、なければ Stub 実装で動作する**（`docs/infrastructure.md` の「外部 API 依存の扱い」を参照）
+- 認証機能なら → 開発環境で認証フローが動作する（ローカル Supabase Auth）
 
-- 認証機能なら → Supabase プロジェクトを作成し、実際にログイン・ログアウトできる
-- DB 永続化なら → 実際にデータが保存・表示される
-- 外部 API 連携なら → 実際にリクエストが飛んでレスポンスが返る
+**外部 API の Stub は「ダミー」ではない。** Gateway interface に対する正規の実装であり、Composition Root による DI で切り替える（`docs/infrastructure.md` 参照）。E2E テストは Stub で通り、API キーがある環境では本物で動作する — これが正しい状態。
 
-「コードは書いたが動かしたことがない」状態で Milestone を完了にしてはならない。動かせない機能のコードを先に書くくらいなら、動かせる機能を先に作る方が良い。
+「コードは書いたが動かしたことがない」状態で Milestone を完了にしてはならない。
+
+### 環境変数の初期化
+
+基盤 Milestone のゴールには、以下の環境変数セットアップを含めること:
+
+1. **ルート `.env` にある変数を `apps/{app}/.env.local` にコピーする**（Next.js はルートの `.env` を読まない）
+2. **アプリが必要とするが `.env` に存在しない変数は `dummy` で埋める**（Stub 動作のトリガーになる）
+3. **ローカル Supabase の接続情報を `.env.local` に設定する**（`supabase start` の出力から取得）
+
+これにより、API キーの有無に関わらず `pnpm dev` と E2E テストが動作する状態を基盤 Milestone で保証する。
 
 ### goal の書き方
 
