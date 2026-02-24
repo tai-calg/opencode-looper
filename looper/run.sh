@@ -67,33 +67,35 @@ git worktree prune 2>/dev/null || true
 log "=========================================="
 log "  Ralph Loop Engine"
 log "=========================================="
-log "  残り Milestone: $(jq '[.[]|select(.done==false)]|length' "$PLAN")"
+log "  残り Milestone: $(jq '[.milestones[]|select(.done==false)]|length' "$PLAN")"
 log "  並列上限:  $MAX_PARALLEL"
 log "  ログ:      $LOG_DIR"
 
 if $DRY_RUN; then
-	jq -r '.[] | "  Milestone \(.milestone): \(if .done then "完了" else .goal end)"' "$PLAN"
+	jq -r '.milestones[] | "  Milestone \(.milestone): \(if .done then "完了" else .goal end)"' "$PLAN"
 	log "ドライラン完了。"
 	exit 0
 fi
 
 # === Milestone ループ ===
 round=0
-for milestone in $(jq -r '.[]|select(.done==false)|.milestone' "$PLAN"); do
-	goal=$(jq -r --argjson m "$milestone" '.[]|select(.milestone==$m)|.goal' "$PLAN")
+SOURCE_DOC=$(jq -r '.source // empty' "$PLAN")
+for milestone in $(jq -r '.milestones[]|select(.done==false)|.milestone' "$PLAN"); do
+	goal=$(jq -r --argjson m "$milestone" '.milestones[]|select(.milestone==$m)|.goal' "$PLAN")
 	log "========== Milestone $milestone 開始 =========="
 	log "ゴール: $goal"
 
 	# ① Planner
 	plan_doc="docs/tasks/milestone-${milestone}.md"
-	task_count=$(jq --argjson m "$milestone" '[.[]|select(.milestone==$m)|.tasks[]?]|length' "$PLAN")
+	task_count=$(jq --argjson m "$milestone" '[.milestones[]|select(.milestone==$m)|.tasks[]?]|length' "$PLAN")
 	if [ "$task_count" -eq 0 ]; then
 		log "Planner: Milestone $milestone の設計ドキュメント作成中..."
 		prompt=$(<"$SCRIPT_DIR/prompts/planner.md")
 		prompt="${prompt//__MILESTONE__/$milestone}"
 		prompt="${prompt//__GOAL__/$goal}"
+		prompt="${prompt//__SOURCE_DOC__/${SOURCE_DOC:-}}"
 		run_claude "$prompt" "$LOG_DIR/plan-milestone${milestone}.log"
-		task_count=$(jq --argjson m "$milestone" '[.[]|select(.milestone==$m)|.tasks[]?]|length' "$PLAN")
+		task_count=$(jq --argjson m "$milestone" '[.milestones[]|select(.milestone==$m)|.tasks[]?]|length' "$PLAN")
 		[ "$task_count" -eq 0 ] && die "Planner が Milestone $milestone のタスクを生成しませんでした"
 		[ -f "$plan_doc" ] || die "Planner が設計ドキュメント $plan_doc を生成しませんでした"
 		log "Planner: ${task_count} タスク生成 + 設計ドキュメント作成"
@@ -105,7 +107,7 @@ for milestone in $(jq -r '.[]|select(.done==false)|.milestone' "$PLAN"); do
 		[ "$round" -gt "$MAX_ROUNDS" ] && die "ラウンド上限 ($MAX_ROUNDS) に到達しました"
 
 		wave=$(jq -r --argjson m "$milestone" \
-			'.[]|select(.milestone==$m)|[.tasks[]|select(.done==false)|.wave]|min // empty' "$PLAN")
+			'.milestones[]|select(.milestone==$m)|[.tasks[]|select(.done==false)|.wave]|min // empty' "$PLAN")
 		[ -z "$wave" ] && break
 
 		# 未完了タスク取得
@@ -113,7 +115,7 @@ for milestone in $(jq -r '.[]|select(.done==false)|.milestone' "$PLAN"); do
 		while IFS= read -r tid; do
 			[ -n "$tid" ] && task_ids+=("$tid")
 		done < <(jq -r --argjson m "$milestone" --argjson w "$wave" \
-			'.[]|select(.milestone==$m)|.tasks[]|select(.wave==$w and .done==false)|.id' "$PLAN")
+			'.milestones[]|select(.milestone==$m)|.tasks[]|select(.wave==$w and .done==false)|.id' "$PLAN")
 
 		batch=("${task_ids[@]:0:$MAX_PARALLEL}")
 		log "Wave $wave: ${batch[*]} (${#batch[@]} 並列)"
@@ -129,7 +131,7 @@ for milestone in $(jq -r '.[]|select(.done==false)|.milestone' "$PLAN"); do
 			symlink_node_modules "$wt"
 
 			desc=$(jq -r --argjson m "$milestone" --arg id "$id" \
-				'.[]|select(.milestone==$m)|.tasks[]|select(.id==$id)|.description' "$PLAN")
+				'.milestones[]|select(.milestone==$m)|.tasks[]|select(.id==$id)|.description' "$PLAN")
 			prompt="${builder_prompt_tpl//__TASK_ID__/$id}"
 			prompt="${prompt//__TASK_DESC__/$desc}"
 			prompt="${prompt//__PLAN_DOC__/$plan_doc}"
@@ -160,7 +162,7 @@ for milestone in $(jq -r '.[]|select(.done==false)|.milestone' "$PLAN"); do
 		log "Verifier: セッション完了"
 	done
 
-	milestone_done=$(jq -r --argjson m "$milestone" '.[]|select(.milestone==$m)|.done' "$PLAN")
+	milestone_done=$(jq -r --argjson m "$milestone" '.milestones[]|select(.milestone==$m)|.done' "$PLAN")
 	if [ "$milestone_done" = "true" ]; then
 		log "========== Milestone $milestone 完了 =========="
 	else

@@ -46,31 +46,35 @@ mv looper/milestones.json "looper/milestones.$(date +%Y%m%d_%H%M%S).json"
 唯一の成果物は looper/milestones.json。
 
 ```json
-[
-  {
-    "milestone": 1,
-    "goal": "何が動く状態になるか（1文、具体的に）",
-    "verification": "pnpm lint && pnpm typecheck && pnpm build",
-    "done": false,
-    "tasks": []
-  },
-  {
-    "milestone": 2,
-    "goal": "...",
-    "verification": "pnpm test && pnpm lint && pnpm typecheck",
-    "done": false,
-    "tasks": []
-  }
-]
+{
+  "source": "docs/tasks/YYYYMMDD_HHMM_設計ドキュメント名.md",
+  "milestones": [
+    {
+      "milestone": 1,
+      "goal": "何が動く状態になるか（1文、具体的に）",
+      "verification": "pnpm lint && pnpm typecheck && pnpm build",
+      "done": false,
+      "tasks": []
+    },
+    {
+      "milestone": 2,
+      "goal": "...",
+      "verification": "pnpm test && pnpm lint && pnpm typecheck",
+      "done": false,
+      "tasks": []
+    }
+  ]
+}
 ```
 
 | フィールド | 型 | 説明 |
 |-----------|------|------|
-| milestone | number | Milestone 番号（1 始まり、昇順） |
-| goal | string | この Milestone が完了したとき何が動く状態か（1文、具体的に） |
-| verification | string | Milestone 完了時の通過条件コマンド |
-| done | boolean | 常に false（ループが更新する） |
-| tasks | array | 常に空配列（Milestone 着手時に計画セッションが生成する） |
+| source | string | 元の設計ドキュメントのパス（引数で渡されたファイル） |
+| milestones[].milestone | number | Milestone 番号（1 始まり、昇順） |
+| milestones[].goal | string | この Milestone が完了したとき何が動く状態か（1文、具体的に） |
+| milestones[].verification | string | Milestone 完了時の通過条件コマンド |
+| milestones[].done | boolean | 常に false（ループが更新する） |
+| milestones[].tasks | array | 常に空配列（Milestone 着手時に計画セッションが生成する） |
 
 ## Milestone の設計方針
 

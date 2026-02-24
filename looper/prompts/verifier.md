@@ -34,7 +34,7 @@ git merge --no-edit worktree/{task-id}
   - [docs/quality.md](docs/quality.md): 品質
   - 両方の変更内容を理解し、規約に沿って適切に統合して解決する
 - 解決不可能なコンフリクト: `git merge --abort` して、そのブランチはスキップする
-- マージ成功したタスクは `looper/milestones.json` の該当タスクの `done` を `true` に更新する
+- マージ成功したタスクは `looper/milestones.json` の該当タスクの `done` を `true` に更新する（ファイルは `{"source": "...", "milestones": [...]}` 形式。`milestones` 配列内の該当エントリを更新すること）
 - マージ失敗したタスクは `done: false` のまま残す（次のラウンドでリトライされる）
 
 ### マージ後のクリーンアップ

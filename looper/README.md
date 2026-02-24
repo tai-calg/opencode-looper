@@ -179,16 +179,23 @@ looper/
 ## milestones.json スキーマ
 
 ```json
-[
-  {
-    "milestone": 1,
-    "goal": "検証可能なゴール記述",
-    "verification": "ゴール達成を検証するコマンド",
-    "done": false,
-    "tasks": []
-  }
-]
+{
+  "source": "docs/tasks/YYYYMMDD_HHMM_設計ドキュメント名.md",
+  "milestones": [
+    {
+      "milestone": 1,
+      "goal": "検証可能なゴール記述",
+      "verification": "ゴール達成を検証するコマンド",
+      "done": false,
+      "tasks": []
+    }
+  ]
+}
 ```
+
+| フィールド | 説明 |
+|---|---|
+| `source` | 元の設計ドキュメントのパス。Planner が毎回参照する |
 
 tasks は Planner が自動生成する:
 
@@ -218,6 +225,7 @@ tasks は Planner が自動生成する:
 |---|---|---|
 | `__MILESTONE__` | 現在の Milestone 番号 | planner, verifier |
 | `__GOAL__` | Milestone のゴール | planner |
+| `__SOURCE_DOC__` | 元の設計ドキュメントのパス | planner |
 | `__TASK_ID__` | タスク ID | builder |
 | `__TASK_DESC__` | タスク description | builder |
 | `__PLAN_DOC__` | 設計ドキュメントのパス | builder |
