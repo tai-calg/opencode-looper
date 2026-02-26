@@ -150,13 +150,13 @@
 					"id": "source-infrastructure",
 					"description": "ドキュメント milestone-5 のステップ B（PrismaSourceRepository + PrismaSourceArticleRepository + NoteApi/Stub ArticleFetchAdapter + PrismaKnowledgeRepository 拡張）を実装する",
 					"wave": 2,
-					"done": false
+					"done": true
 				},
 				{
 					"id": "source-usecases",
 					"description": "ドキュメント milestone-5 のステップ C（ListSources/CreateSource/GetSourceDetail/SyncArticles/ImportArticles UseCase + Unit テスト）を実装する",
 					"wave": 2,
-					"done": false
+					"done": true
 				},
 				{
 					"id": "source-presentation",
