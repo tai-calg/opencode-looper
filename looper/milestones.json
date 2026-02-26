@@ -65,7 +65,7 @@
 			"milestone": 3,
 			"goal": "/knowledge ページでナレッジの一覧表示・手動追加・編集・削除ができ、追加・更新時に OpenAI API で embedding が自動生成されて DB に永続化される",
 			"verification": "pnpm verify",
-			"done": false,
+			"done": true,
 			"plan_doc": "docs/tasks/20260226_1559_milestone-3.md",
 			"tasks": [
 				{
@@ -78,7 +78,7 @@
 					"id": "knowledge-infrastructure-and-ui",
 					"description": "ドキュメント milestone-3 のステップ B（OpenAI/Stub Embedding アダプタ + Prisma Repository + Composition + Loader + Actions + KnowledgeDialog + KnowledgeTable + ページ更新）を実装する",
 					"wave": 2,
-					"done": false
+					"done": true
 				}
 			]
 		},
