@@ -222,7 +222,7 @@
 					"id": "supabase-setup-and-infrastructure",
 					"description": "ドキュメント milestone-7 のステップ B（Supabase SSR パッケージ追加 + Supabase クライアント生成 + PrismaUserRepository + middleware）を実装する",
 					"wave": 2,
-					"done": false
+					"done": true
 				},
 				{
 					"id": "auth-routes-and-composition",
