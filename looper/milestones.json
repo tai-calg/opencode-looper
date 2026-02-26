@@ -162,7 +162,7 @@
 					"id": "source-presentation",
 					"description": "ドキュメント milestone-5 のステップ D（Composition 更新 + Loader + Action）を実装する",
 					"wave": 3,
-					"done": false
+					"done": true
 				},
 				{
 					"id": "source-frontend",
