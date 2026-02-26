@@ -12,7 +12,7 @@
 					"id": "monorepo-scaffolding",
 					"description": "ドキュメント milestone-1 のステップ A（monorepo + Next.js + Tailwind + shadcn/ui + 品質ツール設定）を実装する",
 					"wave": 1,
-					"done": false
+					"done": true
 				},
 				{
 					"id": "prisma-schema-and-db",
