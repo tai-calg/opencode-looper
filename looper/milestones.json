@@ -72,7 +72,7 @@
 					"id": "knowledge-domain-and-usecases",
 					"description": "ドキュメント milestone-3 のステップ A（EmbeddingGateway インターフェース + SourceType + KnowledgeItem ドメインモデル + Repository インターフェース + 4 UseCase + Unit テスト）を実装する",
 					"wave": 1,
-					"done": false
+					"done": true
 				},
 				{
 					"id": "knowledge-infrastructure-and-ui",
