@@ -44,10 +44,16 @@ export class RunCheckUseCase {
 		title?: string;
 		platform?: string;
 		content: string;
+		source?: string;
+		slackChannel?: string;
+		slackThreadTs?: string;
 		userId?: string;
 	}): Promise<string> {
 		// 1. Check 作成
-		const result = Check.create({ ...params, source: 'web' });
+		const result = Check.create({
+			...params,
+			source: params.source ?? 'web',
+		});
 		if (!result.success) {
 			throw new Error(result.error);
 		}

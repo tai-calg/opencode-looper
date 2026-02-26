@@ -10,7 +10,10 @@ export async function createCheck(params: {
 	try {
 		const useCase = createRunCheckUseCase();
 		// バックグラウンドでチェックを開始し、即座に ID を返す
-		const checkId = await useCase.execute(params);
+		const checkId = await useCase.execute({
+			...params,
+			source: 'web',
+		});
 		return { success: true, checkId };
 	} catch (error) {
 		return {

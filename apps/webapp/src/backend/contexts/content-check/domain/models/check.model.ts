@@ -27,6 +27,8 @@ export class Check {
 		platform?: string;
 		content: string;
 		source: string;
+		slackChannel?: string;
+		slackThreadTs?: string;
 		userId?: string;
 	}): Result<Check, string> {
 		if (!params.content.trim()) {
@@ -42,8 +44,8 @@ export class Check {
 				platform: params.platform || null,
 				content: params.content,
 				source: params.source,
-				slackChannel: null,
-				slackThreadTs: null,
+				slackChannel: params.slackChannel ?? null,
+				slackThreadTs: params.slackThreadTs ?? null,
 				userId: params.userId ?? null,
 				status: 'processing',
 				sections: [],
