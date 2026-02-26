@@ -18,19 +18,19 @@
 					"id": "prisma-schema-and-db",
 					"description": "ドキュメント milestone-1 のステップ B（Prisma スキーマ全テーブル定義 + DB クライアント初期化）を実装する",
 					"wave": 2,
-					"done": false
+					"done": true
 				},
 				{
 					"id": "backend-shared-and-auth",
 					"description": "ドキュメント milestone-1 のステップ C（共有ドメインモデル + 開発用認証バックエンド）を実装する",
 					"wave": 2,
-					"done": false
+					"done": true
 				},
 				{
 					"id": "frontend-login-and-sidebar",
 					"description": "ドキュメント milestone-1 のステップ D（ログインページ + サイドバーコンポーネント）を実装する",
 					"wave": 2,
-					"done": false
+					"done": true
 				},
 				{
 					"id": "auth-layout-and-pages",
