@@ -123,7 +123,7 @@
 					"id": "check-orchestration-and-presentation",
 					"description": "ドキュメント milestone-4 のステップ F（RunCheckUseCase + Composition + Loaders + Actions + Unit テスト）を実装する",
 					"wave": 3,
-					"done": false
+					"done": true
 				},
 				{
 					"id": "check-frontend",
