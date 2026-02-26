@@ -93,7 +93,7 @@
 					"id": "check-domain-contracts",
 					"description": "ドキュメント milestone-4 のステップ A（AIGateway インターフェース + content-check ドメインモデル + Gateway/Repository インターフェース + Unit テスト）を実装する",
 					"wave": 1,
-					"done": false
+					"done": true
 				},
 				{
 					"id": "ai-adapters",
