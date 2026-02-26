@@ -144,7 +144,7 @@
 					"id": "source-domain-contracts",
 					"description": "ドキュメント milestone-5 のステップ A（Source/SourceArticle ドメインモデル + Repository/Gateway インターフェース + KnowledgeItem 拡張 + Unit テスト）を実装する",
 					"wave": 1,
-					"done": false
+					"done": true
 				},
 				{
 					"id": "source-infrastructure",
