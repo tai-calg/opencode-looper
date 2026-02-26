@@ -176,7 +176,7 @@
 			"milestone": 6,
 			"goal": "Slack でボットにメンションするとスレッドのメッセージが Claude API で自動チェックされ、結果サマリーと Web へのパーマリンクが Slack API 経由でスレッドに投稿される",
 			"verification": "pnpm verify",
-			"done": false,
+			"done": true,
 			"plan_doc": "docs/tasks/20260226_1837_milestone-6.md",
 			"tasks": [
 				{
@@ -201,7 +201,7 @@
 					"id": "slack-presentation",
 					"description": "ドキュメント milestone-6 のステップ D（Composition 更新 + API Route）を実装する",
 					"wave": 3,
-					"done": false
+					"done": true
 				}
 			]
 		},
