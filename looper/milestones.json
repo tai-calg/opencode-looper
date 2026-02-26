@@ -177,7 +177,33 @@
 			"goal": "Slack でボットにメンションするとスレッドのメッセージが Claude API で自動チェックされ、結果サマリーと Web へのパーマリンクが Slack API 経由でスレッドに投稿される",
 			"verification": "pnpm verify",
 			"done": false,
-			"tasks": []
+			"plan_doc": "docs/tasks/20260226_1837_milestone-6.md",
+			"tasks": [
+				{
+					"id": "slack-domain-contracts",
+					"description": "ドキュメント milestone-6 のステップ A（SlackGateway インターフェース + Check/RunCheckUseCase のパラメータ拡張）を実装する",
+					"wave": 1,
+					"done": false
+				},
+				{
+					"id": "slack-infrastructure",
+					"description": "ドキュメント milestone-6 のステップ B（SlackWebApiAdapter + StubSlackAdapter 実装）を実装する",
+					"wave": 2,
+					"done": false
+				},
+				{
+					"id": "slack-usecase",
+					"description": "ドキュメント milestone-6 のステップ C（HandleSlackMentionUseCase + Unit テスト）を実装する",
+					"wave": 2,
+					"done": false
+				},
+				{
+					"id": "slack-presentation",
+					"description": "ドキュメント milestone-6 のステップ D（Composition 更新 + API Route）を実装する",
+					"wave": 3,
+					"done": false
+				}
+			]
 		},
 		{
 			"milestone": 7,
