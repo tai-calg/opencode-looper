@@ -51,7 +51,7 @@
 					"id": "rule-domain-and-usecases",
 					"description": "ドキュメント milestone-2 のステップ A（ExpressionRule ドメインモデル + Repository インターフェース + 5 UseCase + Unit テスト）を実装する",
 					"wave": 1,
-					"done": false
+					"done": true
 				},
 				{
 					"id": "rule-infrastructure-and-ui",
