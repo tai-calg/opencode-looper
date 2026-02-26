@@ -7,6 +7,7 @@ import { KnowledgeDialog } from '@/frontend/components/knowledge-dialog';
 import { KnowledgeTable } from '@/frontend/components/knowledge-table';
 import { Button } from '@/frontend/components/ui/button';
 import { Database, Plus } from 'lucide-react';
+import Link from 'next/link';
 
 export default async function KnowledgePage() {
 	const items = await loadKnowledgeList();
@@ -26,8 +27,8 @@ export default async function KnowledgePage() {
 						title="ナレッジ追加"
 						onSubmit={createKnowledge}
 					/>
-					<Button variant="outline" disabled>
-						ソースから取り込む
+					<Button variant="outline" asChild>
+						<Link href="/knowledge/sources">ソースから取り込む</Link>
 					</Button>
 				</div>
 			</div>
