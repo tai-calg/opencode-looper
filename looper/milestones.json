@@ -216,7 +216,7 @@
 					"id": "auth-domain-and-repository",
 					"description": "ドキュメント milestone-7 のステップ A（User ドメインモデル + UserRepository インターフェース）を実装する",
 					"wave": 1,
-					"done": false
+					"done": true
 				},
 				{
 					"id": "supabase-setup-and-infrastructure",
