@@ -1,4 +1,5 @@
 import { logout } from '@/backend/contexts/auth/presentation/actions/logout.action';
+import { isSkipAuth } from '@/backend/contexts/auth/presentation/composition/auth.composition';
 import { loadSession } from '@/backend/contexts/auth/presentation/loaders/session.loader';
 import { Sidebar } from '@/frontend/components/sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/frontend/components/ui/avatar';
@@ -12,10 +13,9 @@ export default async function AuthLayout({
 }: {
 	children: React.ReactNode;
 }) {
-	const skipAuth = process.env.SKIP_AUTH === 'true';
 	const session = await loadSession();
 
-	if (!session && !skipAuth) {
+	if (!session && !isSkipAuth()) {
 		redirect('/login');
 	}
 

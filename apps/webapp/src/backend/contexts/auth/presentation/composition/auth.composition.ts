@@ -1,16 +1,27 @@
 import { cookies } from 'next/headers';
+import { z } from 'zod';
 import { UpsertUserOnLoginUseCase } from '../../application/usecases/upsert-user-on-login.usecase';
 import { PrismaUserRepository } from '../../infrastructure/repositories/prisma-user.repository';
 import { createSupabaseServerClient } from '../../infrastructure/supabase/supabase-client';
 
 const DEV_SESSION_COOKIE = 'dev-session';
 
-type DevSession = {
-	userId: string;
-	email: string;
-	name: string;
-	avatarUrl?: string;
-};
+/**
+ * 開発用認証スキップが有効かどうかを判定する。
+ * production 環境では常に false を返す。
+ */
+export function isSkipAuth(): boolean {
+	return process.env.SKIP_AUTH === 'true' && process.env.NODE_ENV !== 'production';
+}
+
+const DevSessionSchema = z.object({
+	userId: z.string(),
+	email: z.string(),
+	name: z.string(),
+	avatarUrl: z.string().optional(),
+});
+
+type DevSession = z.infer<typeof DevSessionSchema>;
 
 export type SessionUser = {
 	id: string;
@@ -23,20 +34,19 @@ export type SessionUser = {
  * セッション取得（Supabase Auth / 開発用 Cookie の二系統を統合）
  */
 export async function getSession(): Promise<SessionUser | null> {
-	const skipAuth = process.env.SKIP_AUTH === 'true';
-
-	if (skipAuth) {
+	if (isSkipAuth()) {
 		// 開発用 Cookie からセッション取得
 		const cookieStore = await cookies();
 		const raw = cookieStore.get(DEV_SESSION_COOKIE)?.value;
 		if (!raw) return null;
 		try {
-			const devSession = JSON.parse(raw) as DevSession;
+			const parsed = DevSessionSchema.safeParse(JSON.parse(raw));
+			if (!parsed.success) return null;
 			return {
-				id: devSession.userId,
-				email: devSession.email,
-				name: devSession.name,
-				avatarUrl: devSession.avatarUrl,
+				id: parsed.data.userId,
+				email: parsed.data.email,
+				name: parsed.data.name,
+				avatarUrl: parsed.data.avatarUrl,
 			};
 		} catch {
 			return null;
@@ -77,9 +87,7 @@ export async function setDevSession(session: DevSession): Promise<void> {
  * セッションクリア（Supabase signOut / 開発用 Cookie 削除）
  */
 export async function clearSession(): Promise<void> {
-	const skipAuth = process.env.SKIP_AUTH === 'true';
-
-	if (skipAuth) {
+	if (isSkipAuth()) {
 		const cookieStore = await cookies();
 		cookieStore.delete(DEV_SESSION_COOKIE);
 		return;

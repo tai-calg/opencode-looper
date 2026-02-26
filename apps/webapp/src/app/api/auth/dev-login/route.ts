@@ -1,8 +1,11 @@
-import { setDevSession } from '@/backend/contexts/auth/presentation/composition/auth.composition';
+import {
+	isSkipAuth,
+	setDevSession,
+} from '@/backend/contexts/auth/presentation/composition/auth.composition';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
-	if (process.env.SKIP_AUTH !== 'true') {
+	if (!isSkipAuth()) {
 		return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 	}
 

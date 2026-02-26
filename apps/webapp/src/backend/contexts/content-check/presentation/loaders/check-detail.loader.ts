@@ -31,9 +31,9 @@ export type CheckDetail = {
 	createdAt: string;
 };
 
-export async function loadCheckDetail(id: string): Promise<CheckDetail> {
+export async function loadCheckDetail(id: string, userId?: string): Promise<CheckDetail> {
 	const useCase = createGetCheckDetailUseCase();
-	const check = await useCase.execute(id);
+	const check = await useCase.execute(id, userId);
 	return {
 		id: check.id,
 		displayTitle: check.displayTitle,

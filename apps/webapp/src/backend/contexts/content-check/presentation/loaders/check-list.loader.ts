@@ -12,6 +12,7 @@ export type CheckListItem = {
 export async function loadCheckList(params?: {
 	limit?: number;
 	offset?: number;
+	userId?: string;
 }): Promise<{ checks: CheckListItem[]; total: number }> {
 	const useCase = createListChecksUseCase();
 	const { checks, total } = await useCase.execute(params);

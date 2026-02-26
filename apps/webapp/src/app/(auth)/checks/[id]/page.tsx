@@ -1,3 +1,4 @@
+import { getSession } from '@/backend/contexts/auth/presentation/composition/auth.composition';
 import {
 	type CheckDetail,
 	loadCheckDetail,
@@ -11,10 +12,11 @@ export default async function CheckDetailPage({
 	params: Promise<{ id: string }>;
 }) {
 	const { id } = await params;
+	const session = await getSession();
 
 	let check: CheckDetail;
 	try {
-		check = await loadCheckDetail(id);
+		check = await loadCheckDetail(id, session?.id);
 	} catch {
 		notFound();
 	}

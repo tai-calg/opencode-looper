@@ -42,7 +42,10 @@ module.exports = {
 			from: { path: '^src/backend/contexts/(?!shared/)([^/]+)/' },
 			to: {
 				path: '^src/backend/contexts/(?!shared/)([^/]+)/',
-				pathNot: '^src/backend/contexts/[^/]+/presentation/composition/',
+				pathNot: [
+					'^src/backend/contexts/$1/',
+					'^src/backend/contexts/[^/]+/presentation/composition/',
+				],
 			},
 		},
 		{

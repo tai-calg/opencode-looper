@@ -13,9 +13,9 @@ import type { Severity } from '../../domain/models/severity.model';
 import type { CheckRepository } from '../../domain/repositories/check.repository';
 
 export class PrismaCheckRepository implements CheckRepository {
-	async findById(id: string): Promise<Check | null> {
-		const row = await prisma.check.findUnique({
-			where: { id },
+	async findById(id: string, userId?: string): Promise<Check | null> {
+		const row = await prisma.check.findFirst({
+			where: { id, ...(userId !== undefined ? { userId } : {}) },
 			include: {
 				sections: {
 					include: { issues: true },
@@ -26,8 +26,9 @@ export class PrismaCheckRepository implements CheckRepository {
 		return row ? this.toDomain(row) : null;
 	}
 
-	async findAll(params?: { limit?: number; offset?: number }): Promise<Check[]> {
+	async findAll(params?: { limit?: number; offset?: number; userId?: string }): Promise<Check[]> {
 		const rows = await prisma.check.findMany({
+			where: params?.userId !== undefined ? { userId: params.userId } : {},
 			orderBy: { createdAt: 'desc' },
 			take: params?.limit ?? 20,
 			skip: params?.offset ?? 0,
@@ -105,12 +106,19 @@ export class PrismaCheckRepository implements CheckRepository {
 		});
 	}
 
-	async delete(id: string): Promise<void> {
-		await prisma.check.delete({ where: { id } });
+	async delete(id: string, userId?: string): Promise<void> {
+		if (userId !== undefined) {
+			const result = await prisma.check.deleteMany({ where: { id, userId } });
+			if (result.count === 0) {
+				throw new Error('チェック結果が見つかりません');
+			}
+		} else {
+			await prisma.check.delete({ where: { id } });
+		}
 	}
 
-	async count(): Promise<number> {
-		return prisma.check.count();
+	async count(userId?: string): Promise<number> {
+		return prisma.check.count(userId !== undefined ? { where: { userId } } : undefined);
 	}
 
 	private toDomain(

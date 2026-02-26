@@ -1,3 +1,4 @@
+import { getSession } from '@/backend/contexts/auth/presentation/composition/auth.composition';
 import { loadCheckList } from '@/backend/contexts/content-check/presentation/loaders/check-list.loader';
 import { Badge } from '@/frontend/components/ui/badge';
 import { Button } from '@/frontend/components/ui/button';
@@ -25,7 +26,8 @@ const statusVariants: Record<string, 'default' | 'secondary' | 'destructive'> = 
 };
 
 export default async function DashboardPage() {
-	const { checks, total } = await loadCheckList({ limit: 20 });
+	const session = await getSession();
+	const { checks, total } = await loadCheckList({ limit: 20, userId: session?.id });
 
 	return (
 		<div>

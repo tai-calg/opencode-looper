@@ -1,11 +1,12 @@
 import { createSupabaseMiddlewareClient } from '@/backend/contexts/auth/infrastructure/supabase/supabase-client';
+import { isSkipAuth } from '@/backend/contexts/auth/presentation/composition/auth.composition';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export async function middleware(request: NextRequest) {
 	const response = NextResponse.next({ request });
 
-	// SKIP_AUTH=true のときは middleware で認証チェックしない
-	if (process.env.SKIP_AUTH === 'true') {
+	// SKIP_AUTH=true かつ非 production のときは middleware で認証チェックしない
+	if (isSkipAuth()) {
 		return response;
 	}
 
