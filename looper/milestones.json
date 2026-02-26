@@ -99,25 +99,25 @@
 					"id": "ai-adapters",
 					"description": "ドキュメント milestone-4 のステップ B（Anthropic AI アダプタ + Stub AI アダプタ + @ai-sdk/anthropic パッケージ追加）を実装する",
 					"wave": 2,
-					"done": false
+					"done": true
 				},
 				{
 					"id": "individual-check-usecases",
 					"description": "ドキュメント milestone-4 のステップ C（SplitContentUseCase + 5観点チェック UseCase + Unit テスト）を実装する",
 					"wave": 2,
-					"done": false
+					"done": true
 				},
 				{
 					"id": "check-crud-usecases",
 					"description": "ドキュメント milestone-4 のステップ D（GetCheckDetail + ListChecks + ResolveIssue + RetryCheck + DeleteCheck UseCase + Unit テスト）を実装する",
 					"wave": 2,
-					"done": false
+					"done": true
 				},
 				{
 					"id": "check-infrastructure",
 					"description": "ドキュメント milestone-4 のステップ E（PrismaCheckRepository + ExpressionRuleQuery/KnowledgeSearch アダプタ）を実装する",
 					"wave": 2,
-					"done": false
+					"done": true
 				},
 				{
 					"id": "check-orchestration-and-presentation",
