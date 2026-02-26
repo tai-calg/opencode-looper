@@ -5,7 +5,7 @@
 			"milestone": 1,
 			"goal": "pnpm dev で開発サーバーが起動し、SKIP_AUTH=true で開発用ログイン後、サイドバー（チェック一覧・表現ルール・ナレッジ）付きのダッシュボードページが表示され、pnpm verify が通る",
 			"verification": "pnpm verify",
-			"done": false,
+			"done": true,
 			"plan_doc": "docs/tasks/20260226_1451_milestone-1.md",
 			"tasks": [
 				{
@@ -36,7 +36,7 @@
 					"id": "auth-layout-and-pages",
 					"description": "ドキュメント milestone-1 のステップ E（認証レイアウト + ダッシュボード・ルール・ナレッジページ）を実装する",
 					"wave": 3,
-					"done": false
+					"done": true
 				}
 			]
 		},
