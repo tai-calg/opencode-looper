@@ -183,7 +183,7 @@
 					"id": "slack-domain-contracts",
 					"description": "ドキュメント milestone-6 のステップ A（SlackGateway インターフェース + Check/RunCheckUseCase のパラメータ拡張）を実装する",
 					"wave": 1,
-					"done": false
+					"done": true
 				},
 				{
 					"id": "slack-infrastructure",
