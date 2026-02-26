@@ -44,7 +44,7 @@
 			"milestone": 2,
 			"goal": "/rules ページで表現ルール（NG表現→OK表現）の一覧表示・新規追加・編集・削除・有効/無効切替ができ、データが DB に永続化される",
 			"verification": "pnpm verify",
-			"done": false,
+			"done": true,
 			"plan_doc": "docs/tasks/20260226_1528_milestone-2.md",
 			"tasks": [
 				{
@@ -57,7 +57,7 @@
 					"id": "rule-infrastructure-and-ui",
 					"description": "ドキュメント milestone-2 のステップ B（Prisma Repository 実装 + Composition + Loader + Actions + RuleDialog + RulesTable + ページ更新）を実装する",
 					"wave": 2,
-					"done": false
+					"done": true
 				}
 			]
 		},
