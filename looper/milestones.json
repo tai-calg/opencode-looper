@@ -189,13 +189,13 @@
 					"id": "slack-infrastructure",
 					"description": "ドキュメント milestone-6 のステップ B（SlackWebApiAdapter + StubSlackAdapter 実装）を実装する",
 					"wave": 2,
-					"done": false
+					"done": true
 				},
 				{
 					"id": "slack-usecase",
 					"description": "ドキュメント milestone-6 のステップ C（HandleSlackMentionUseCase + Unit テスト）を実装する",
 					"wave": 2,
-					"done": false
+					"done": true
 				},
 				{
 					"id": "slack-presentation",
