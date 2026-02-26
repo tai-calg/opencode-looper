@@ -56,8 +56,9 @@ git worktree remove /tmp/ralph-worktrees/{task-id} --force
 
 ### 検証レベルの判定
 
-`looper/milestones.json` を読み、この Milestone（__MILESTONE__）に **未完了タスク（`done: false`）が残っているか** を確認する。
+`looper/milestones.json` を読み、この Milestone（__MILESTONE__）に **未完了タスク（`done: false`）が残っているか** を確認する。また、今回マージしたタスクの wave を確認する。
 
+- **今回のタスクが全て W1（型定義・interface のみ）の場合**: `pnpm verify` をスキップする。W1 は契約定義のみで実装ロジックを含まないため、検証のオーバーヘッドに見合わない
 - **未完了タスクが残っている（中間 Wave）**: `pnpm verify` を実行する（E2E なし）
 - **全タスクが `done: true`（Milestone 完了）**: `pnpm verify:full` を実行する（E2E 含む）
 
