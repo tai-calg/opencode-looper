@@ -6,7 +6,14 @@
       "goal": "pnpm dev で開発サーバーが起動し、SKIP_AUTH=true で開発用ログイン後、サイドバー（チェック一覧・表現ルール・ナレッジ）付きのダッシュボードページが表示され、pnpm verify が通る",
       "verification": "pnpm verify",
       "done": false,
-      "tasks": []
+      "plan_doc": "docs/tasks/20260226_1451_milestone-1.md",
+      "tasks": [
+        {"id": "monorepo-scaffolding", "description": "ドキュメント milestone-1 のステップ A（monorepo + Next.js + Tailwind + shadcn/ui + 品質ツール設定）を実装する", "wave": 1, "done": false},
+        {"id": "prisma-schema-and-db", "description": "ドキュメント milestone-1 のステップ B（Prisma スキーマ全テーブル定義 + DB クライアント初期化）を実装する", "wave": 2, "done": false},
+        {"id": "backend-shared-and-auth", "description": "ドキュメント milestone-1 のステップ C（共有ドメインモデル + 開発用認証バックエンド）を実装する", "wave": 2, "done": false},
+        {"id": "frontend-login-and-sidebar", "description": "ドキュメント milestone-1 のステップ D（ログインページ + サイドバーコンポーネント）を実装する", "wave": 2, "done": false},
+        {"id": "auth-layout-and-pages", "description": "ドキュメント milestone-1 のステップ E（認証レイアウト + ダッシュボード・ルール・ナレッジページ）を実装する", "wave": 3, "done": false}
+      ]
     },
     {
       "milestone": 2,
