@@ -86,7 +86,7 @@
 			"milestone": 4,
 			"goal": "/checks/new からテキストを入力してチェックを実行すると、Claude API による5観点（事実確認・ナレッジ整合・表現ルール・炎上リスク・文章品質）の並列チェックが実行され、/checks/[id] で進行状況のポーリングと実際の AI レスポンスによる結果一覧が表示される",
 			"verification": "pnpm verify",
-			"done": false,
+			"done": true,
 			"plan_doc": "docs/tasks/20260226_1709_milestone-4.md",
 			"tasks": [
 				{
@@ -129,7 +129,7 @@
 					"id": "check-frontend",
 					"description": "ドキュメント milestone-4 のステップ G（checks/new ページ + checks/[id] ページ + コンポーネント + useCheckStatus フック + ダッシュボード更新）を実装する",
 					"wave": 4,
-					"done": false
+					"done": true
 				}
 			]
 		},
