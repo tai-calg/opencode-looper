@@ -210,7 +210,27 @@
 			"goal": "Google OAuth でのログインフローが動作し、team-mir.ai ドメインのアカウントのみがログインでき、未認証ユーザーは /login にリダイレクトされ、初回ログイン時に users テーブルにレコードが作成される",
 			"verification": "pnpm verify",
 			"done": false,
-			"tasks": []
+			"plan_doc": "docs/tasks/20260226_2022_milestone-7.md",
+			"tasks": [
+				{
+					"id": "auth-domain-and-repository",
+					"description": "ドキュメント milestone-7 のステップ A（User ドメインモデル + UserRepository インターフェース）を実装する",
+					"wave": 1,
+					"done": false
+				},
+				{
+					"id": "supabase-setup-and-infrastructure",
+					"description": "ドキュメント milestone-7 のステップ B（Supabase SSR パッケージ追加 + Supabase クライアント生成 + PrismaUserRepository + middleware）を実装する",
+					"wave": 2,
+					"done": false
+				},
+				{
+					"id": "auth-routes-and-composition",
+					"description": "ドキュメント milestone-7 のステップ C（OAuth Route Handler + Callback + ドメイン検証 + Composition 更新 + ログインページ更新 + レイアウト更新）を実装する",
+					"wave": 3,
+					"done": false
+				}
+			]
 		}
 	]
 }
