@@ -138,7 +138,39 @@
 			"goal": "/knowledge/sources でソース接続を追加し、/knowledge/sources/[id] で note.com API から記事一覧を取得・選択してナレッジとして取り込め、OpenAI API で embedding が自動生成される",
 			"verification": "pnpm verify",
 			"done": false,
-			"tasks": []
+			"plan_doc": "docs/tasks/20260226_1753_milestone-5.md",
+			"tasks": [
+				{
+					"id": "source-domain-contracts",
+					"description": "ドキュメント milestone-5 のステップ A（Source/SourceArticle ドメインモデル + Repository/Gateway インターフェース + KnowledgeItem 拡張 + Unit テスト）を実装する",
+					"wave": 1,
+					"done": false
+				},
+				{
+					"id": "source-infrastructure",
+					"description": "ドキュメント milestone-5 のステップ B（PrismaSourceRepository + PrismaSourceArticleRepository + NoteApi/Stub ArticleFetchAdapter + PrismaKnowledgeRepository 拡張）を実装する",
+					"wave": 2,
+					"done": false
+				},
+				{
+					"id": "source-usecases",
+					"description": "ドキュメント milestone-5 のステップ C（ListSources/CreateSource/GetSourceDetail/SyncArticles/ImportArticles UseCase + Unit テスト）を実装する",
+					"wave": 2,
+					"done": false
+				},
+				{
+					"id": "source-presentation",
+					"description": "ドキュメント milestone-5 のステップ D（Composition 更新 + Loader + Action）を実装する",
+					"wave": 3,
+					"done": false
+				},
+				{
+					"id": "source-frontend",
+					"description": "ドキュメント milestone-5 のステップ E（/knowledge/sources ページ + /knowledge/sources/[id] ページ + コンポーネント + ナレッジページ更新）を実装する",
+					"wave": 4,
+					"done": false
+				}
+			]
 		},
 		{
 			"milestone": 6,
