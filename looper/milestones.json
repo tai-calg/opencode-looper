@@ -209,7 +209,7 @@
 			"milestone": 7,
 			"goal": "Google OAuth でのログインフローが動作し、team-mir.ai ドメインのアカウントのみがログインでき、未認証ユーザーは /login にリダイレクトされ、初回ログイン時に users テーブルにレコードが作成される",
 			"verification": "pnpm verify",
-			"done": false,
+			"done": true,
 			"plan_doc": "docs/tasks/20260226_2022_milestone-7.md",
 			"tasks": [
 				{
@@ -228,7 +228,7 @@
 					"id": "auth-routes-and-composition",
 					"description": "ドキュメント milestone-7 のステップ C（OAuth Route Handler + Callback + ドメイン検証 + Composition 更新 + ログインページ更新 + レイアウト更新）を実装する",
 					"wave": 3,
-					"done": false
+					"done": true
 				}
 			]
 		}
