@@ -1,7 +1,7 @@
 import { logout } from '@/backend/contexts/auth/presentation/actions/logout.action';
 import { loadSession } from '@/backend/contexts/auth/presentation/loaders/session.loader';
 import { Sidebar } from '@/frontend/components/sidebar';
-import { Avatar, AvatarFallback } from '@/frontend/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/frontend/components/ui/avatar';
 import { Button } from '@/frontend/components/ui/button';
 import { Separator } from '@/frontend/components/ui/separator';
 import { LogOut } from 'lucide-react';
@@ -31,6 +31,7 @@ export default async function AuthLayout({
 						<div className="p-4">
 							<div className="mb-2 flex items-center gap-2">
 								<Avatar className="h-8 w-8">
+									{session.avatarUrl && <AvatarImage src={session.avatarUrl} alt={session.name} />}
 									<AvatarFallback>{session.name.charAt(0)}</AvatarFallback>
 								</Avatar>
 								<span className="truncate text-sm">{session.name}</span>

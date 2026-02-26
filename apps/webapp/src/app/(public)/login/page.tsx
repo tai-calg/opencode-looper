@@ -40,8 +40,8 @@ async function LoginContent({
 						<p className="text-sm text-destructive text-center">認証エラーが発生しました</p>
 					)}
 
-					<Button className="w-full" disabled>
-						Google アカウントでログイン
+					<Button className="w-full" asChild>
+						<a href="/api/auth/login">Google アカウントでログイン</a>
 					</Button>
 
 					{skipAuth && (

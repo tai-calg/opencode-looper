@@ -1,4 +1,4 @@
-import { createAuthService } from '@/backend/contexts/auth/presentation/composition/auth.composition';
+import { setDevSession } from '@/backend/contexts/auth/presentation/composition/auth.composition';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -6,8 +6,7 @@ export async function POST(request: Request) {
 		return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 	}
 
-	const authService = createAuthService();
-	await authService.setDevSession({
+	await setDevSession({
 		userId: 'dev-user-id',
 		email: 'dev@team-mir.ai',
 		name: '開発ユーザー',
