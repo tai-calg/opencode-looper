@@ -1,0 +1,54 @@
+{
+  "source": "docs/tasks/20260226_1343_コンテンツレビューアー設計.md",
+  "milestones": [
+    {
+      "milestone": 1,
+      "goal": "pnpm dev で開発サーバーが起動し、SKIP_AUTH=true で開発用ログイン後、サイドバー（チェック一覧・表現ルール・ナレッジ）付きのダッシュボードページが表示され、pnpm verify が通る",
+      "verification": "pnpm verify",
+      "done": false,
+      "tasks": []
+    },
+    {
+      "milestone": 2,
+      "goal": "/rules ページで表現ルール（NG表現→OK表現）の一覧表示・新規追加・編集・削除・有効/無効切替ができ、データが DB に永続化される",
+      "verification": "pnpm verify",
+      "done": false,
+      "tasks": []
+    },
+    {
+      "milestone": 3,
+      "goal": "/knowledge ページでナレッジの一覧表示・手動追加・編集・削除ができ、追加・更新時に OpenAI API で embedding が自動生成されて DB に永続化される",
+      "verification": "pnpm verify",
+      "done": false,
+      "tasks": []
+    },
+    {
+      "milestone": 4,
+      "goal": "/checks/new からテキストを入力してチェックを実行すると、Claude API による5観点（事実確認・ナレッジ整合・表現ルール・炎上リスク・文章品質）の並列チェックが実行され、/checks/[id] で進行状況のポーリングと実際の AI レスポンスによる結果一覧が表示される",
+      "verification": "pnpm verify",
+      "done": false,
+      "tasks": []
+    },
+    {
+      "milestone": 5,
+      "goal": "/knowledge/sources でソース接続を追加し、/knowledge/sources/[id] で note.com API から記事一覧を取得・選択してナレッジとして取り込め、OpenAI API で embedding が自動生成される",
+      "verification": "pnpm verify",
+      "done": false,
+      "tasks": []
+    },
+    {
+      "milestone": 6,
+      "goal": "Slack でボットにメンションするとスレッドのメッセージが Claude API で自動チェックされ、結果サマリーと Web へのパーマリンクが Slack API 経由でスレッドに投稿される",
+      "verification": "pnpm verify",
+      "done": false,
+      "tasks": []
+    },
+    {
+      "milestone": 7,
+      "goal": "Google OAuth でのログインフローが動作し、team-mir.ai ドメインのアカウントのみがログインでき、未認証ユーザーは /login にリダイレクトされ、初回ログイン時に users テーブルにレコードが作成される",
+      "verification": "pnpm verify",
+      "done": false,
+      "tasks": []
+    }
+  ]
+}
