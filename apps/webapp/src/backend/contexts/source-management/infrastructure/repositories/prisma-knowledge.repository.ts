@@ -55,6 +55,14 @@ export class PrismaKnowledgeRepository implements KnowledgeRepository {
 		await prisma.knowledgeItem.delete({ where: { id } });
 	}
 
+	async findBySourceArticleIds(sourceArticleIds: string[]): Promise<KnowledgeItem[]> {
+		if (sourceArticleIds.length === 0) return [];
+		const rows = await prisma.knowledgeItem.findMany({
+			where: { sourceArticleId: { in: sourceArticleIds } },
+		});
+		return rows.map((row) => this.toDomain(row));
+	}
+
 	private toDomain(row: {
 		id: string;
 		title: string;

@@ -23,6 +23,7 @@ export class KnowledgeItem {
 		sourceType: string;
 		content: string;
 		sourceUrl?: string;
+		sourceArticleId?: string;
 	}): Result<KnowledgeItem, string> {
 		if (!params.title.trim()) {
 			return Result.err('タイトルは必須です');
@@ -42,7 +43,7 @@ export class KnowledgeItem {
 				sourceUrl: params.sourceUrl?.trim() || null,
 				content: params.content.trim(),
 				embedding: null,
-				sourceArticleId: null,
+				sourceArticleId: params.sourceArticleId ?? null,
 				createdAt: now,
 				updatedAt: now,
 			}),

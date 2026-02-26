@@ -14,6 +14,7 @@ function createMockRepository(): KnowledgeRepository {
 		findById: vi.fn().mockResolvedValue(null),
 		save: vi.fn().mockResolvedValue(undefined),
 		delete: vi.fn().mockResolvedValue(undefined),
+		findBySourceArticleIds: vi.fn().mockResolvedValue([]),
 	};
 }
 
