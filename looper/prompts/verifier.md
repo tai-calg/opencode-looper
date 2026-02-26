@@ -54,9 +54,18 @@ git worktree remove /tmp/ralph-worktrees/{task-id} --force
 
 ## ステップ3: 品質検証
 
-### E2E テスト実行前のポート開放
+### 検証レベルの判定
 
-`pnpm verify` の前に、E2E テストが使用するポート（3000 等）を占有しているプロセスを kill する。Builder が並列実行した際の残プロセスがポートを占有していることがある。
+`looper/milestones.json` を読み、この Milestone（__MILESTONE__）に **未完了タスク（`done: false`）が残っているか** を確認する。
+
+- **未完了タスクが残っている（中間 Wave）**: `pnpm verify` を実行する（E2E なし）
+- **全タスクが `done: true`（Milestone 完了）**: `pnpm verify:full` を実行する（E2E 含む）
+
+中間 Wave では Builder が既に `pnpm verify` を通してからコミットしているため、マージ後の型整合性チェック（lint + typecheck + unit test）で十分。E2E は Milestone 完了時にのみ実行する。
+
+### E2E テスト実行前のポート開放（Milestone 完了時のみ）
+
+`pnpm verify:full` を実行する場合、E2E テストが使用するポート（3000 等）を占有しているプロセスを kill する。Builder が並列実行した際の残プロセスがポートを占有していることがある。
 
 ```bash
 lsof -ti:3000 | xargs kill -9 2>/dev/null || true
@@ -66,7 +75,9 @@ lsof -ti:3000 | xargs kill -9 2>/dev/null || true
 
 ### 検証実行
 
-`pnpm verify:full` を実行する。E2E にはローカル Supabase が必要なので、実行前に `pnpm supabase status` で起動を確認し、停止中なら `pnpm supabase start` + `prisma db push` を行うこと。
+**中間 Wave の場合:** `pnpm verify` を実行する。
+
+**Milestone 完了の場合:** `pnpm verify:full` を実行する。E2E にはローカル Supabase が必要なので、実行前に `pnpm supabase status` で起動を確認し、停止中なら `pnpm supabase start` + `prisma db push` を行うこと。
 
 > **注意:** `supabase` コマンドはグローバルインストールされていない。必ず `pnpm supabase` 経由で実行すること（pnpm が node_modules/.bin を解決する）。
 
@@ -127,7 +138,7 @@ lsof -ti:3000 | xargs kill -9 2>/dev/null || true
 
 **手順:**
 1. 修正を実施する
-2. `pnpm verify:full` を再実行する
+2. ステップ3 で判定した検証レベルと同じコマンドを再実行する（中間 Wave なら `pnpm verify`、Milestone 完了なら `pnpm verify:full`）
 3. 通過したら変更をコミットする:
    ```
    git add -A && git commit -m "fix(verifier): 修正内容の要約"
