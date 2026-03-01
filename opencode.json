@@ -1,0 +1,87 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  "agent": {
+    "planner": {
+      "description": "Milestoneをタスク分解し、設計ドキュメントと milestones.json を更新する（実装はしない）",
+      "mode": "primary",
+      "permission": {
+        "edit": "allow",
+        "webfetch": "allow",
+        "bash": { "*": "deny" ,
+	  			"pwd": "allow",
+  				"ls*": "allow"}
+      }
+    },
+
+    "builder": {
+      "description": "指定タスクを実装し、テストしてコミットする（pushしない）",
+      "mode": "primary",
+      "permission": {
+        "edit": "allow",
+        "webfetch": "allow",
+        "bash": {
+          "*": "deny",
+			"pwd": "allow",
+			"ls*": "allow",
+
+          "git status*": "allow",
+          "git diff*": "allow",
+          "git add*": "allow",
+          "git commit*": "allow",
+          "git restore*": "allow",
+          "git reset*": "allow",
+          "git checkout*": "allow",
+          "git log*": "allow",
+          "git show*": "allow",
+          "git rev-list*": "allow",
+
+          "npm test*": "allow",
+          "pnpm test*": "allow",
+          "yarn test*": "allow",
+          "pytest*": "allow",
+
+          "rg *": "allow",
+          "grep *": "allow"
+        }
+      }
+    },
+
+    "verifier": {
+      "description": "マージ対象ブランチを検証し、merge / revert / worktree掃除を行う（pushしない）",
+      "mode": "primary",
+      "permission": {
+        "edit": "allow",
+        "webfetch": "deny",
+        "bash": {
+          "*": "deny",
+			"pwd": "allow",
+			"ls*": "allow",
+
+          "git status*": "allow",
+          "git diff*": "allow",
+          "git log*": "allow",
+          "git show*": "allow",
+
+          "git merge*": "allow",
+          "git revert*": "allow",
+
+          "git checkout*": "allow",
+          "git reset*": "allow",
+          "git restore*": "allow",
+
+          "git branch -D*": "allow",
+          "git worktree*": "allow",
+
+          "npm test*": "allow",
+          "pnpm test*": "allow",
+          "yarn test*": "allow",
+          "pytest*": "allow",
+
+          "rg *": "allow",
+          "grep *": "allow"
+        }
+      }
+    }
+  }
+}
