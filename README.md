@@ -4,6 +4,19 @@ OpenCode による自律開発ループ。3 エージェント（計画→並列
 
 ブログ記事の補足資料として公開しています。汎用ライブラリではありません。自分のプロジェクトに合わせて自由に改変してください。
 
+## このリポジトリの使い方 
+このopencode-looper ディレクトリはlooper開発を利用したい各プロジェクトごとに、コピーをする必要があります。cp -aをすると.opencodeだけでなく.gitもコピーされてしまうため以下のコマンドでコピーしてください。
+（package.jsonの中の"@opencode-ai/plugin": "1.2.10"は手動で追加してください。）
+
+```
+rsync -av --ignore-existing \
+  --exclude='.git' \
+  --exclude='README.md' \
+  --exclude='package.json' \
+  --exclude='package-lock.json' \
+  opencode-looper/ ./copy_dest_project/
+```
+
 ## 仕組み
 
 ```
