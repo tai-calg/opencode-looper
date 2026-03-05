@@ -1,4 +1,4 @@
-```md
+
 # Looper（OpenCode版）
 
 OpenCode エージェントによる自律的並列開発エンジン。
