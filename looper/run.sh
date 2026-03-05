@@ -8,11 +8,10 @@
 # 使い方:
 #   bash looper/run.sh              # 実行
 #   bash looper/run.sh --dry-run    # 実行計画の確認のみ
-#!/bin/bash
-# looper/run-opencode.sh — 3エージェント並列開発ループ (OpenCode版)
 
 #!/bin/bash
 set -euo pipefail
+TIMEOUT_BIN="$(command -v timeout || command -v gtimeout || true)"
 
 # mac だけスリープ防止
 if command -v caffeinate >/dev/null 2>&1; then
@@ -57,10 +56,15 @@ run_opencode() {
   [[ -n "$OPENCODE_MODEL" ]] && args+=(--model "$OPENCODE_MODEL")
   [[ -n "$OPENCODE_ATTACH_URL" ]] && args+=(--attach "$OPENCODE_ATTACH_URL")
 
-  timeout "$SESSION_TIMEOUT" \
-    env OPENCODE_CONFIG="$OPENCODE_CONFIG_PATH" \
-        OPENCODE_DISABLE_CLAUDE_CODE=1 \
-    "${args[@]}" "$prompt" < /dev/null > "$logfile" 2>&1
+  if [ -n "$TIMEOUT_BIN" ]; then
+    "$TIMEOUT_BIN" "$SESSION_TIMEOUT" \
+      env OPENCODE_CONFIG="$OPENCODE_CONFIG" \
+          OPENCODE_DISABLE_CLAUDE_CODE=1 \
+      "${args[@]}" "$prompt" < /dev/null > "$logfile" 2>&1
+  else
+    env OPENCODE_CONFIG="$OPENCODE_CONFIG" OPENCODE_DISABLE_CLAUDE_CODE=1 \
+      "${args[@]}" "$prompt" < /dev/null > "$logfile" 2>&1
+  fi
 }
 
 symlink_node_modules() {
@@ -76,7 +80,7 @@ symlink_node_modules() {
 
 # === 前提チェック ===
 [ -f "$PLAN" ] || die "$PLAN が見つかりません"
-[ -f "$OPENCODE_CONFIG_PATH" ] || die "OpenCode config が見つかりません: $OPENCODE_CONFIG_PATH"
+[ -f "$OPENCODE_CONFIG" ] || die "OpenCode config が見つかりません: $OPENCODE_CONFIG"
 command -v jq &>/dev/null || die "jq が必要です"
 command -v opencode &>/dev/null || die "opencode CLI が必要です"
 git diff --quiet HEAD 2>/dev/null || die "未コミットの変更があります。先にコミットしてください。"

@@ -16,7 +16,19 @@ OpenCode エージェントによる自律的並列開発エンジン。
 - `AGENTS.md` はプロジェクト規約（ルール）としてエージェントが参照する
 - 既に `AGENTS.md` がある場合、`/init` は追記・更新を試みる
 
-### 1. 設計ドキュメントを作成する
+### 1. タスクを一括で投入する（VIBE.md）
+
+「わんこそば」的にタスクを投げたい場合は、プロジェクト直下の `VIBE.md` にタスクを箇条書きでリストアップし、OpenCode で `/vibe` コマンドを実行する。
+
+```
+
+/vibe
+
+```
+
+これにより大小のタスクが自動分類され、`milestones.json` と仕様書（設計ドキュメント）が一気に生成される。
+
+### 2. 個別に設計ドキュメントを作成する（従来フロー）
 
 OpenCode のカスタムコマンド `/plan` を実行し、作りたいものを伝える。
 
@@ -36,7 +48,7 @@ opencode run --command plan "以下のアプリケーションの設計を行っ
 
 ```
 
-### 2. Milestone を生成する
+### 3. 個別の Milestone を生成する（従来フロー）
 
 `/gen-milestones` コマンドに設計ドキュメントを渡し、`looper/milestones.json` を生成する。
 
@@ -54,14 +66,14 @@ opencode run --command gen-milestones "docs/tasks/設計ドキュメント.md"
 
 ````
 
-### 3. ループを実行する
+### 4. ループを実行する
 
 ```bash
 bash looper/run.sh              # 実行
 bash looper/run.sh --dry-run    # 実行計画の確認のみ
 ````
 
-### 4. 監視する
+### 5. 監視する
 
 ```bash
 watch -n3 bash looper/monitor.sh          # 簡易表示（3 秒更新）
